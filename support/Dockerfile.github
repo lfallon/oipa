@@ -1,0 +1,19 @@
+FROM plugins/git
+
+RUN apk add --update bash && rm -rf /var/cache/apk/*
+
+ENV EMAIL=
+ENV PASS=
+ENV NAME=
+
+VOLUME /workspace
+WORKDIR /workspace
+
+ADD github.sh /entry.sh
+RUN chmod 755 /entry.sh
+
+ENTRYPOINT ["/entry.sh"]
+
+# Test
+# docker build -t local/github -f Dockerfile.github .
+# docker run -v $(pwd):/workspace -e EMAIL=jeromebridge@gmail.com -e PASS=Equisoft001 local/github status

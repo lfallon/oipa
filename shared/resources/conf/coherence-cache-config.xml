@@ -1,0 +1,126 @@
+<!DOCTYPE cache-config SYSTEM "cache-config.dtd">
+
+<cache-config
+	xmlns:processing="class:com.oracle.coherence.patterns.processing.configuration.ProcessingPatternNamespaceHandler">
+	<processing:cluster-config pof="true">
+		<processing:dispatchers>
+			<processing:task-dispatcher displayname="Task Dispatcher"
+				priority="1">
+				<processing:composite-policy>
+					<processing:attribute-match-policy />
+					<processing:round-robin-policy />
+				</processing:composite-policy>
+			</processing:task-dispatcher>
+		</processing:dispatchers>
+		<!-- MAKE SURE THAT ALL IDs ARE UNIQUE ACROSS THE CLUSTER, OR THE MEMBER 
+			WILL NOT PARTICIPATE IN GRID PROCESSING -->
+		<processing:taskprocessors>
+			<processing:taskprocessordefinition
+				id="PASRunnableTaskProcessor" displayname="PAS Runnable Task Processor"
+				type="SINGLE" taskpattern="SingleTask">
+				<processing:default-taskprocessor
+					id="PAS Runnable Task Processor" threadpoolsize="10"></processing:default-taskprocessor>
+				<processing:attribute name="type">runnable</processing:attribute>
+			</processing:taskprocessordefinition>
+			<processing:taskprocessordefinition
+				id="PASResumableTaskProcessor" displayname="PAS Resumable Task Processor"
+				type="SINGLE" taskpattern="SingleTask">
+				<processing:default-taskprocessor
+					id="PAS Resumable Task Processor" threadpoolsize="5"></processing:default-taskprocessor>
+				<processing:attribute name="type">resumable</processing:attribute>
+			</processing:taskprocessordefinition>
+		</processing:taskprocessors>
+	</processing:cluster-config>
+
+	<!-- ============================ -->
+	<!-- Map Caches to the NearScheme -->
+	<!-- ============================ -->
+
+	<caching-scheme-mapping>
+		<cache-mapping>
+			<cache-name>CORE</cache-name>
+			<scheme-name>SampleNearScheme</scheme-name>
+		</cache-mapping>
+		<cache-mapping>
+			<cache-name>PAS</cache-name>
+			<scheme-name>SampleNearScheme</scheme-name>
+		</cache-mapping>
+		<cache-mapping>
+			<cache-name>SRE</cache-name>
+			<scheme-name>SampleNearScheme</scheme-name>
+		</cache-mapping>
+		<cache-mapping>
+			<cache-name>CYCLE</cache-name>
+			<scheme-name>SampleNearScheme</scheme-name>
+		</cache-mapping>
+		<cache-mapping>
+			<cache-name>ClassMembership</cache-name>
+			<scheme-name>SampleMemoryScheme</scheme-name>
+		</cache-mapping>
+		<cache-mapping>
+			<cache-name>LOCAL</cache-name>
+			<scheme-name>SampleMemoryScheme</scheme-name>
+		</cache-mapping>
+	</caching-scheme-mapping>
+
+
+	<caching-schemes>
+
+		<!-- ===================== -->
+		<!-- Local In-memory Cache -->
+		<!-- ===================== -->
+
+
+		<local-scheme>
+			<scheme-name>SampleMemoryScheme</scheme-name>
+		</local-scheme>
+
+
+		<!-- ================================== -->
+		<!-- Size limited Local In-memory Cache -->
+		<!-- ================================== -->
+
+
+		<local-scheme>
+			<scheme-name>SampleMemoryLimitedScheme</scheme-name>
+			<low-units>10</low-units>
+			<high-units>32000</high-units>
+		</local-scheme>
+
+
+		<!-- =========================== -->
+		<!-- Distributed In-memory Cache -->
+		<!-- =========================== -->
+
+
+		<distributed-scheme>
+			<scheme-name>SamplePartitionedScheme</scheme-name>
+			<backing-map-scheme>
+				<local-scheme>
+					<scheme-ref>SampleMemoryScheme</scheme-ref>
+				</local-scheme>
+			</backing-map-scheme>
+		</distributed-scheme>
+
+
+		<!-- ======================== -->
+		<!-- Cache Cluster Definition -->
+		<!-- ======================== -->
+
+
+		<near-scheme>
+			<scheme-name>SampleNearScheme</scheme-name>
+			<front-scheme>
+				<local-scheme>
+					<scheme-ref>SampleMemoryLimitedScheme</scheme-ref>
+				</local-scheme>
+			</front-scheme>
+			<back-scheme>
+				<distributed-scheme>
+					<scheme-ref>SamplePartitionedScheme</scheme-ref>
+				</distributed-scheme>
+			</back-scheme>
+		</near-scheme>
+
+	</caching-schemes>
+</cache-config>

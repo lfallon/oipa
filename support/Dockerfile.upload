@@ -1,0 +1,12 @@
+FROM openjdk:8-jdk
+
+ADD .tmp/target/upload/*deb .
+RUN dpkg -i *.deb
+
+VOLUME /src
+WORKDIR /src
+
+ENTRYPOINT ["oipa-upload"]
+
+# Testing
+# docker run -v $(pwd)/staging:/src oipa/upload version
