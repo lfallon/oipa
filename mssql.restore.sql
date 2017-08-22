@@ -77,4 +77,4 @@ BEGIN
 END
 
 IF @Action = 'names'
-   SELECT DatabaseName FROM @RestoreTable
+   SELECT TRIM(DatabaseName) FROM @RestoreTable

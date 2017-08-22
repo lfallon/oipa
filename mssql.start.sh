@@ -25,7 +25,7 @@ print() {
   start &>/dev/null
 
   export ACTION=names
-  /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -W -i /scripts/restore.sql
+  /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -r1 -W -i /scripts/restore.sql | dos2unix
 }
 
 help() {

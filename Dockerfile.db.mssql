@@ -1,5 +1,7 @@
 FROM microsoft/mssql-server-linux
 
+RUN apt-get update && apt-get install dos2unix
+
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=SQLServerPass1
 

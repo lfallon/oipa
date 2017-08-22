@@ -21,7 +21,7 @@ make push
 
 # Run From MSSQL Backup File
 1. Copy your database backup into the `env/restore` folder
-2. Run Docker Compose to start the app `export DB_NAME=$(docker-compose run db print-restore-db) && docker-compose up`
+2. Run Docker Compose to start the app `export DB_NAME=$(docker-compose run -T db print-restore-db) && docker-compose up`
 
 
 # Notes
