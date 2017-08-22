@@ -1,16 +1,43 @@
 #!/bin/bash
 
-echo "call me first"
-
-setup() {
-  #wait for the SQL Server to come up
+_wait() {
+  # Wait for the SQL Server to come up
   sleep 5s
-
-  /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -i /scripts/restore.sql
 }
 
-/opt/mssql/bin/sqlservr &
-setup
+start() {
+  # Start MSSQL
+  /opt/mssql/bin/sqlservr &
+  _wait
+}
 
-# Wait Forever
-while true; do sleep 10; done
+restore() {
+  start
+
+  export ACTION=execute
+  /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -i /scripts/restore.sql
+
+  # Wait Forever
+  while true; do sleep 10; done
+}
+
+print() {
+  start &>/dev/null
+
+  export ACTION=names
+  /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -W -i /scripts/restore.sql
+}
+
+help() {
+  /opt/mssql-tools/bin/sqlcmd -?
+}
+
+
+# Execute Command (If Present)
+if [ -z "$1" ] ; then CMD=print ; else CMD=$1 ; fi
+
+case $CMD in
+  print-restore-db ) print ;;
+  help ) help ;;
+  * ) restore ;;
+esac

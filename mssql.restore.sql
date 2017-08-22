@@ -1,4 +1,9 @@
+ SET NOCOUNT ON;
+
 -- Parameters
+-- :setvar ACTION 'execute'
+DECLARE @Action VARCHAR(1000) = N'$(ACTION)'
+-- DECLARE @Action VARCHAR(1000) = 'names'
 DECLARE @BackupPath VARCHAR(1000) = '/restore'
 DECLARE @DataPath VARCHAR(1000) = '/var/opt/mssql/data'
 -- List Of Files
@@ -35,6 +40,7 @@ DECLARE @DataFile VARCHAR(1000)
 DECLARE @LogFile VARCHAR(1000)
 DECLARE @DatabaseName VARCHAR(1000)
 DECLARE @RestoreSql NVARCHAR(4000)
+DECLARE @RestoreTable TABLE( DatabaseName VARCHAR(1000), RestoreSql NVARCHAR(4000) )
 DECLARE db_cursor CURSOR FOR SELECT BackupFile FROM @FileList WHERE BackupFile LIKE '%.BAK'
 OPEN db_cursor
 FETCH NEXT FROM db_cursor INTO @BackupFileName
@@ -46,16 +52,29 @@ BEGIN
    INSERT INTO @BackupFileList EXEC('RESTORE FILELISTONLY FROM DISK = ''' + @BackupFilePath + '''' )
    INSERT INTO @BackupHeader EXEC('RESTORE HEADERONLY FROM DISK = ''' + @BackupFilePath + '''' )
    SET @DatabaseName = (SELECT TOP 1 DatabaseName FROM @BackupHeader)
-   INSERT INTO @BackupHeader EXEC('RESTORE HEADERONLY FROM DISK = ''/restore/OIPA_Sandbox_backup_20170821070015.bak''' )
-   SELECT LogicalName FROM @BackupFileList WHERE Type='D'
-   SELECT TOP 1 DatabaseName FROM @BackupHeader
    SELECT @RestoreSql = COALESCE( @RestoreSql + ', ', '') + 'MOVE ''' + LogicalName + ''' TO ''' + @DataPath + '/' + @DatabaseName + '.' + LogicalName + '.mdf''' FROM @BackupFileList WHERE Type='D'
    SELECT @RestoreSql = COALESCE( @RestoreSql + ', ', '') + 'MOVE ''' + LogicalName + ''' TO ''' + @DataPath + '/' + @DatabaseName + '.' + LogicalName + '.ldf''' FROM @BackupFileList WHERE Type='L'
    SET @RestoreSql = 'RESTORE DATABASE ' + @DatabaseName + ' FROM DISK = ''' + @BackupFilePath + ''' WITH REPLACE, ' + @RestoreSql
-
-   EXEC sp_executesql @RestoreSql
+   INSERT INTO @RestoreTable VALUES( @DatabaseName, @RestoreSql )
 
    FETCH NEXT FROM db_cursor INTO @BackupFileName
 END
 CLOSE db_cursor
 DEALLOCATE db_cursor
+
+IF @Action = 'execute'
+BEGIN
+   DECLARE db_cursor2 CURSOR FOR SELECT DatabaseName, RestoreSql FROM @RestoreTable
+   OPEN db_cursor2
+   FETCH NEXT FROM db_cursor2 INTO @DatabaseName, @RestoreSql
+   WHILE @@FETCH_STATUS = 0
+   BEGIN
+      EXEC sp_executesql @RestoreSql
+      FETCH NEXT FROM db_cursor2 INTO @DatabaseName, @RestoreSql
+   END
+   CLOSE db_cursor2
+   DEALLOCATE db_cursor2
+END
+
+IF @Action = 'names'
+   SELECT DatabaseName FROM @RestoreTable
