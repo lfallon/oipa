@@ -19,6 +19,11 @@ make build
 make push
 ```
 
+# Run From MSSQL Backup File
+1. Copy your database backup into the `env/restore` folder
+2. Run Docker Compose to start the app `export DB_NAME=OIPA_Sandbox && docker-compose up`
+
+
 # Notes
 
 1. Upload war and artifacts to repo

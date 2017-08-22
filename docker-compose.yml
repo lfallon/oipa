@@ -8,6 +8,8 @@ services:
     volumes:
       - db-data:/var/opt/mssql
       - ./env/restore:/restore
+    ports:
+      - 1433:1433
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=SQLServerPass1
@@ -23,7 +25,7 @@ services:
       - 7777:7777
     environment:
       - DB_HOST=db
-      - DB_NAME=OIPA
+      - DB_NAME=${DB_NAME}
       - DB_USER=sa
       - DB_PASSWORD=SQLServerPass1
 
