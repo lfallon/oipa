@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db.mssql
+    volumes:
+      - db-data:/var/opt/mssql
+      - ./env/restore:/restore
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SQLServerPass1
+
+  oipa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - db
+    ports:
+      - 9080:9080
+      - 7777:7777
+    environment:
+      - DB_HOST=db
+      - DB_NAME=OIPA
+      - DB_USER=sa
+      - DB_PASSWORD=SQLServerPass1
+
+volumes:
+  db-data:
