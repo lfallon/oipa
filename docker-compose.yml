@@ -22,6 +22,7 @@ services:
       - db
     ports:
       - 9080:9080
+      - 9443:9443
       - 7777:7777
     environment:
       - DB_HOST=db

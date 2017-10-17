@@ -27,7 +27,17 @@ make push
 1. Copy your database backup into the `env/restore` folder
 2. Compile the debugger v10 jar file
 3. Copy the `debugger-v10-*.jar` file to the `env/extensions` folder (ex: `mkdir -p env/extensions && (cd ~/git/oipa-tools/debugger-v10 && mvn clean install) && cp ~/git/oipa-tools/debugger-v10/dist/debugger-v10-*.jar env/extensions`)
+4. Clean volumes (docker-compose bug?): `docker-compose -f docker-compose.yml -f docker-compose.dev.yml rm -v -f`
+5. Run Docker Compose to start the app `export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build`
+
+# Develop Extensions
+1. Copy your database backup into the `env/restore` folder
+2. Compile the extensions jar file
+3. Copy the `extensions-*.jar` file to the `env/extensions` folder (ex: `mkdir -p env/extensions && (cd ~/git/oipa-tools/extensions-example && mvn clean install) && cp ~/git/oipa-tools/extensions-example/dist/extensions*.jar env/extensions && cp ~/git/oipa-tools/extensions-example/src/test/resources/extensions.xml env/extensions`)
 4. Run Docker Compose to start the app `export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up`
+
+# Profiling
+`service:jmx:rest:localhost:9443/IBMJMXConnectorREST`: `pasUser` / `pasUser`
 
 # Notes
 
