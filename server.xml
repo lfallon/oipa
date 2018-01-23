@@ -7,6 +7,7 @@
         <feature>jdbc-4.1</feature>
         <feature>jsp-2.3</feature>
         <feature>jaxws-2.2</feature>
+        <feature>restConnector-1.0</feature>
     </featureManager>
 
     <applicationMonitor dropinsEnabled="true" pollingRate="500ms" updateTrigger="polled"/>
