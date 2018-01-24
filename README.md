@@ -36,6 +36,17 @@ make push
 3. Copy the `extensions-*.jar` file to the `env/extensions` folder (ex: `mkdir -p env/extensions && (cd ~/git/oipa-tools/extensions-example && mvn clean install) && cp ~/git/oipa-tools/extensions-example/dist/extensions*.jar env/extensions && cp ~/git/oipa-tools/extensions-example/src/test/resources/extensions.xml env/extensions`)
 4. Run Docker Compose to start the app `export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up`
 
+## Remote Database
+```shell
+docker stop oipa ; docker rm oipa ; \
+(cd /home/vagrant/git/oipa-tools/debugger-v10/ && mvn clean install) && \
+docker run -d --name oipa -p 9080:9080 -p 7777:7777 \
+  -e DB_NAME=OIPA_Securian_Sandbox \
+  -v /home/vagrant/git/oipa-tools/debugger-v10/dist:/extensions \
+  jeromebridge/oipa:10.2.0.28-sqlserver && \
+docker logs -f oipa
+```
+
 # Profiling
 `service:jmx:rest:localhost:9443/IBMJMXConnectorREST`: `pasUser` / `pasUser`
 
