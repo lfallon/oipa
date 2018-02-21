@@ -32,7 +32,7 @@ RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
 VOLUME /extensions
 
-CMD ["/opt/ibm/docker/docker-server", "run", "defaultServer"]
+CMD ["/opt/ibm/wlp/bin/server", "run", "defaultServer"]
 
 
 # Test
