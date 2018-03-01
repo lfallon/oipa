@@ -33,8 +33,18 @@ make push
 # Develop Extensions
 1. Copy your database backup into the `env/restore` folder
 2. Compile the extensions jar file
-3. Copy the `extensions-*.jar` file to the `env/extensions` folder (ex: `mkdir -p env/extensions && (cd ~/git/oipa-tools/extensions-example && mvn clean install) && cp ~/git/oipa-tools/extensions-example/dist/extensions*.jar env/extensions && cp ~/git/oipa-tools/extensions-example/src/test/resources/extensions.xml env/extensions`)
-4. Run Docker Compose to start the app `export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up`
+3. Copy the `extensions-*.jar` file to the `env/extensions` folder
+    ```
+    mkdir -p env/extensions && \
+    (cd ~/git/oipa-tools/extensions-example && mvn clean install) && \
+    cp ~/git/oipa-tools/extensions-example/dist/extensions*.jar env/extensions && \
+    cp ~/git/oipa-tools/extensions-example/src/test/resources/extensions.xml env/extensions
+    
+    ```
+4. Run Docker Compose to start the app 
+    ```
+    export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+    ```
 
 ## Remote Database
 ```shell
