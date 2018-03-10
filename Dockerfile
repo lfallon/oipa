@@ -30,6 +30,7 @@ COPY shared/ /opt/ibm/wlp/usr/shared/
 ENV DEBUGGER_VERSION=1.04.011
 RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
+COPY extensions.xml /extensions/
 VOLUME /extensions
 
 CMD ["/opt/ibm/wlp/bin/server", "run", "defaultServer"]

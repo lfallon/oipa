@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
 
- <extensionPoint extensionPointName="FileReceived.*" type="com.adminserver.webservice.extensibility.WebserviceExtensionPoint">
-  <register extension="com.pennassurancesoftware.extension.AsFileReceivedExtensionPoint"/>
- </extensionPoint>
-
- <extensionPoint extensionPointName="Login.*" type="com.pennassurancesoftware.example.SSOLogin">
-  <register extension="com.adminserver.pas.uip.extensibility.UipExtensionPoint"/>
- </extensionPoint>
-
 </extensions>
