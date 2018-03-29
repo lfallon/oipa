@@ -34,7 +34,7 @@ public class TestUploadArtifact {
       return ( warFile ) -> System.out.println( oipaVersion( warFile ) );
    }
 
-   @Test(groups = "integration", enabled = false)
+   @Test(groups = "integration", enabled = true)
    public void test_All() throws Exception {
       warFiles().forEach( uploadOracleAll() );
    }
@@ -54,7 +54,7 @@ public class TestUploadArtifact {
       warFiles().forEach( printVersion() );
    }
 
-   @Test(groups = "integration", enabled = true)
+   @Test(groups = "integration", enabled = false)
    public void test_WarOnly() throws Exception {
       warFiles().forEach( uploadOracleWar() );
    }
