@@ -5,7 +5,7 @@ docker run -d --name oipa -p 9080:9080 \
   -e DB_NAME=OIPA_GA \
   -e DB_USER=sa \
   -e DB_PASSWORD=sa \
-  jeromebridge/oipa:10.2.0.28-sqlserver
+  jeromebridge/oipa:10.2.0.30-sqlserver
 ```
 
 # Build And Push
@@ -79,7 +79,7 @@ docker stop oipa ; docker rm oipa ; \
 docker run -d --name oipa -p 9080:9080 -p 7777:7777 \
   -e DB_NAME=OIPA_Securian_Sandbox \
   -v /home/vagrant/git/oipa-tools/debugger-v10/dist:/extensions \
-  jeromebridge/oipa:10.2.0.28-sqlserver && \
+  jeromebridge/oipa:10.2.0.30-sqlserver && \
 docker logs -f oipa
 ```
 

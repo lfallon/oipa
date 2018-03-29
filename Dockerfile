@@ -19,8 +19,8 @@ COPY server.xml /config/
 RUN installUtility install --acceptLicense defaultServer
 
 # Install OIPA
-ARG OIPA_VERSION=10.2.0.28
-# ENV OIPA_VERSION=10.2.0.28
+ARG OIPA_VERSION=10.2.0.30
+# ENV OIPA_VERSION=10.2.0.30
 RUN curl --fail -o /config/apps/PASJava.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PASJava/${OIPA_VERSION}/PASJava-${OIPA_VERSION}.war
 
 # Config
@@ -50,6 +50,6 @@ CMD ["/opt/ibm/wlp/bin/server", "run", "defaultServer"]
 # https://hub.docker.com/_/websphere-liberty/
 
 # Tags
-# pennassurancesoftware/oipa:10.2.0.28-sqlserver
-# pennassurancesoftware/oipa:10.2.0.28-db2
-# pennassurancesoftware/oipa:10.2.0.28-oracle
+# pennassurancesoftware/oipa:10.2.0.30-sqlserver
+# pennassurancesoftware/oipa:10.2.0.30-db2
+# pennassurancesoftware/oipa:10.2.0.30-oracle

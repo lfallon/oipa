@@ -6,6 +6,7 @@ OWNER=jeromebridge
 IMAGE_NAME=oipa
 
 # export GIT_EMAIL=jeromebridge@gmail.com && export GIT_PASS=Equisoft001 && export GIT_NAME="Jerome Bridge" && make upgrade
+# export DOCKER_USER=jeromebridge && export DOCKER_PASS=XXX && make build push
 
 # docker run -v $(SOURCE_PATH):/workspace -e USER=$(GIT_EMAIL) -e PASS=$(GIT_PASS) oipa/github commit --author="$(GIT_NAME) <$(GIT_EMAIL)>" -m "Upgrading to version $(shell $(call version))"
 # git commit --author="Jerome Bridge <jeromebridge@gmail.com>" -m "Upgrading to version 10.2.0.25"
