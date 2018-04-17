@@ -60,7 +60,7 @@ build-support:
 upgrade: build-support upload
 
 upload: build-support guard-GIT_EMAIL guard-GIT_NAME guard-GIT_PASS
-	docker run -v $(SOURCE_PATH)/staging:/src oipa/upload upload
+	docker run -v $(SOURCE_PATH)/env/upload:/src oipa/upload upload
 
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \

@@ -86,6 +86,18 @@ docker logs -f oipa
 # Profiling
 `service:jmx:rest:localhost:9443/IBMJMXConnectorREST`: `pasUser` / `pasUser`
 
+# Upload New War
+
+1. Download `war` file to `env/upload` folder.
+2. Upload to Maven Repository.
+    ```
+    export GIT_EMAIL=jeromebridge@gmail.com && export GIT_PASS=XXX && export GIT_NAME="Jerome Bridge" && make upgrade
+    ```
+3. Update the `build.env` to the version of the `war` you just uploaded.
+    ```
+    export DOCKER_USER=jeromebridge && export DOCKER_PASS=XXX && make build push
+    ```
+
 # Notes
 
 1. Upload war and artifacts to repo
