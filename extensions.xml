@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
-
+    <extensionPoint type="com.adminserver.webservice.extensibility.WebserviceExtensionPoint" extensionPointName="FileReceived.*">
+        <register extension="com.pennassurancesoftware.ext.Extensions$Ws" />
+    </extensionPoint>
+    <extensionPoint type="com.adminserver.sre.extensibility.SreExtensionPoint" extensionPointName="Activity.*">
+        <register extension="com.pennassurancesoftware.ext.Extensions$Activity" />
+    </extensionPoint>
+    <extensionPoint type="com.adminserver.pas.uip.extensibility.UipExtensionPoint" extensionPointName="*">
+        <register extension="com.pennassurancesoftware.ext.Extensions$Ui" />
+    </extensionPoint>
 </extensions>

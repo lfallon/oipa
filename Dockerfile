@@ -27,7 +27,7 @@ RUN curl --fail -o /config/apps/PASJava.war -O http://repo.pennassurancesoftware
 COPY shared/ /opt/ibm/wlp/usr/shared/
 
 # Extensions
-ENV DEBUGGER_VERSION=1.04.011
+ENV DEBUGGER_VERSION=1.04.015
 RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
 COPY extensions.xml /extensions/
@@ -39,7 +39,7 @@ CMD ["/opt/ibm/wlp/bin/server", "run", "defaultServer"]
 # Test
 # docker build -t local/oipa .
 # docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 local/oipa; docker logs -f oipa
-# docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /tmp/logs:/logs -e DB_NAME=OIPA_Securian local/oipa; docker logs -f oipa
+# docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /tmp/logs:/logs -e DB_NAME=OIPA_POC local/oipa; docker logs -f oipa
 # docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /home/vagrant/git/oipa-tools/debugger-v10/dist:/extensions -e DB_NAME=OIPA_Securian local/oipa; docker logs -f oipa
 
 # Notes
