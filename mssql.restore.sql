@@ -52,6 +52,7 @@ BEGIN
    INSERT INTO @BackupFileList EXEC('RESTORE FILELISTONLY FROM DISK = ''' + @BackupFilePath + '''' )
    INSERT INTO @BackupHeader EXEC('RESTORE HEADERONLY FROM DISK = ''' + @BackupFilePath + '''' )
    SET @DatabaseName = (SELECT TOP 1 DatabaseName FROM @BackupHeader)
+   SET @RestoreSql = NULL
    SELECT @RestoreSql = COALESCE( @RestoreSql + ', ', '') + 'MOVE ''' + LogicalName + ''' TO ''' + @DataPath + '/' + @DatabaseName + '.' + LogicalName + '.mdf''' FROM @BackupFileList WHERE Type='D'
    SELECT @RestoreSql = COALESCE( @RestoreSql + ', ', '') + 'MOVE ''' + LogicalName + ''' TO ''' + @DataPath + '/' + @DatabaseName + '.' + LogicalName + '.ldf''' FROM @BackupFileList WHERE Type='L'
    SET @RestoreSql = 'RESTORE DATABASE ' + @DatabaseName + ' FROM DISK = ''' + @BackupFilePath + ''' WITH REPLACE, ' + @RestoreSql
