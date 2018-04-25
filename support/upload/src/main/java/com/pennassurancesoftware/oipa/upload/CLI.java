@@ -25,10 +25,16 @@ public class CLI {
                commandNames = "upload")
          public static class Args implements Command.Args {
             @Parameter(
-                  description = "Path to the OIPA war file or the folder containing the OIPA war file to be uploaded.",
+                  description = "Path to the OIPA war file or the folder containing the OIPA/Palette war(s) file to be uploaded.",
                   arity = 1,
                   required = false)
             public List<String> descriptors;
+
+            @Parameter(
+                  names = { "-p", "--preview" },
+                  description = "Preview what will be uploaded.",
+                  required = false)
+            public Boolean preview = Boolean.FALSE;
 
             @Override
             public <T> T accept( Visitor<T> visitor ) {
@@ -37,27 +43,53 @@ public class CLI {
          }
 
          private final File file;
+         private final Boolean preview;
 
-         public _Upload( File file ) {
+         public _Upload( File file, Boolean preview ) {
             this.file = file;
+            this.preview = preview;
          }
 
          @Override
          public _Upload execute() {
-            System.out.println( String.format( "Uploading %s", preview().version() ) );
-            System.out.println( "Uploading War" );
-            preview().war().upload();
-            System.out.println( "Uploading Classes" );
-            preview().classes().upload();
-            System.out.println( "Uploading Libs" );
-            preview().libs().upload();
-            System.out.println( "Upload Finished" );
+            if( preview ) {
+               _preview();
+            }
+            else {
+               _execute();
+            }
+
             return this;
          }
 
-         private Upload.Oipa.Preview preview() {
-            return Upload.Oipa.from( file ).preview();
+         private void _execute() {
+            from().uploads().forEach( this::_upload );
          }
+
+         private void _upload( Upload.Oipa upload ) {
+            System.out.println( String.format( "Uploading %s", upload ) );
+            System.out.println( "----------------------------------------" );
+            System.out.println( String.format( "Uploading War => %s", upload.preview().war().artifact() ) );
+            upload.preview().war().upload();
+            System.out.println( String.format( "Uploading Classes => %s", upload.preview().classes().artifact() ) );
+            upload.preview().classes().upload();
+            System.out.println( "Uploading Libs" );
+            upload.preview().libs().artifacts().stream().forEach( a -> System.out.println( String.format( "  %s", a ) ) );
+            upload.preview().libs().upload();
+            System.out.println( "Upload Finished" );
+            System.out.println( "" );
+         }
+
+         private void _preview() {
+            System.out.println( "Upload" );
+            System.out.println( "----------------------------------------" );
+            from().uploads().forEach( System.out::println );
+         }
+
+         private Upload.Oipa.From from() {
+            return Upload.Oipa.from( file );
+         }
+
       }
 
       public static interface Args {
@@ -82,17 +114,12 @@ public class CLI {
 
                @Override
                public Command visit( Command._Upload.Args args ) {
-                  return new Command._Upload( file( args.descriptors ) );
+                  return new Command._Upload( file( args.descriptors ), args.preview );
                }
 
                @Override
                public Command.Help visit( Command.Help.Args args ) {
                   return new Command.Help( commander );
-               }
-
-               @Override
-               public Preview visit( Command.Preview.Args args ) {
-                  return new Command.Preview( file( args.descriptors ) );
                }
 
                @Override
@@ -104,8 +131,6 @@ public class CLI {
             T visit( _Upload.Args args );
 
             T visit( Help.Args args );
-
-            T visit( Preview.Args args );
 
             T visit( Version.Args args );
          }
@@ -137,36 +162,6 @@ public class CLI {
          }
       }
 
-      public static class Preview extends Command {
-         @Parameters(
-               commandDescription = "Prints a list of the artifact coordinates that will be uploaded to the Maven Repo.",
-               commandNames = "preview")
-         public static class Args implements Command.Args {
-            @Parameter(
-                  description = "Path to the OIPA war file or the folder containing the OIPA war file to be uploaded.",
-                  arity = 1,
-                  required = false)
-            public List<String> descriptors;
-
-            @Override
-            public <T> T accept( Visitor<T> visitor ) {
-               return visitor.visit( this );
-            }
-         }
-
-         private final File file;
-
-         public Preview( File file ) {
-            this.file = file;
-         }
-
-         @Override
-         public Preview execute() {
-            System.out.println( Upload.Oipa.from( file ).preview() );
-            return this;
-         }
-      }
-
       public static class Version extends Command {
          @Parameters(
                commandDescription = "Prints the version of the specified OIPA war file.",
@@ -192,7 +187,8 @@ public class CLI {
 
          @Override
          public Version execute() {
-            System.out.println( Upload.Oipa.from( file ).version() );
+            Upload.Oipa.from( file ).uploads().forEach( System.out::println );
+            // System.out.println( Upload.Oipa.from( file ).version() );
             return this;
          }
       }
@@ -282,7 +278,6 @@ public class CLI {
       commander.addCommand( new Command.Help.Args() );
       commander.addCommand( new Command._Upload.Args() );
       commander.addCommand( new Command.Version.Args() );
-      commander.addCommand( new Command.Preview.Args() );
       commander.parse( args.toArray( new String[args.size()] ) );
       return commander;
    }

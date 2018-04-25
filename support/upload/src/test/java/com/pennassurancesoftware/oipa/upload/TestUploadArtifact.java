@@ -27,7 +27,7 @@ public class TestUploadArtifact {
    }
 
    private Upload.Oipa.Version oipaVersion( File warFile ) {
-      return Upload.Oipa.Version.from( warFile );
+      return new Upload.Oipa.App( warFile ).version();
    }
 
    private Consumer<File> printVersion() {

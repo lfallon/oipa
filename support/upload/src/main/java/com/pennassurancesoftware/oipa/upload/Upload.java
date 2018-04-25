@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,10 +36,6 @@ import com.pennassurancesoftware.oipa.upload.util.Unzip;
 import com.pennassurancesoftware.oipa.upload.util.Zip;
 
 public abstract class Upload {
-   public static _File file( File file, AetherDeployments deployments, AetherCoordinates coords ) {
-      return new _File( file, deployments, coords );
-   }
-
    public static class _File extends Upload {
       private final static Logger LOG = LoggerFactory.getLogger( _File.class );
 
@@ -71,14 +68,6 @@ public abstract class Upload {
    }
 
    public static abstract class ExplodedWar extends Upload {
-      public static Classes classes( File file, AetherDeployments deployments, AetherCoordinates coords ) {
-         return new Classes( file, deployments, coords );
-      }
-
-      public static Libs libs( File file, AetherDeployments deployments ) {
-         return new Libs( file, deployments );
-      }
-
       public static class Classes extends ExplodedWar {
          private final static Logger LOG = LoggerFactory.getLogger( Classes.class );
 
@@ -92,6 +81,10 @@ public abstract class Upload {
             this.coords = coords;
          }
 
+         public Artifact artifact() {
+            return artifact( jar() );
+         }
+
          private Artifact artifact( File jar ) {
             return new DefaultArtifact(
                   coords.groupId(),
@@ -100,10 +93,6 @@ public abstract class Upload {
                   coords.packaging(),
                   coords.version() )
                   .setFile( jar );
-         }
-
-         public Artifact artifact() {
-            return artifact( jar() );
          }
 
          private File classesFolder() {
@@ -155,6 +144,12 @@ public abstract class Upload {
                   .setFile( lib );
          }
 
+         public List<Artifact> artifacts() {
+            return StreamSupport.stream( libs().spliterator(), false )
+                  .map( f -> artifact( f ) )
+                  .collect( Collectors.toList() );
+         }
+
          private AetherCoordinates coords( File lib ) {
             return new AetherCoordinates.FromArtifactFile( lib );
          }
@@ -180,12 +175,6 @@ public abstract class Upload {
             return result;
          }
 
-         public List<Artifact> artifacts() {
-            return StreamSupport.stream( libs().spliterator(), false )
-                  .map( f -> artifact( f ) )
-                  .collect( Collectors.toList() );
-         }
-
          @Override
          public void upload() {
             artifacts().forEach( a -> {
@@ -202,18 +191,93 @@ public abstract class Upload {
             return new Libs( file, deployments, filters.with( filter ) );
          }
       }
+
+      public static Classes classes( File file, AetherDeployments deployments, AetherCoordinates coords ) {
+         return new Classes( file, deployments, coords );
+      }
+
+      public static Libs libs( File file, AetherDeployments deployments ) {
+         return new Libs( file, deployments );
+      }
    }
 
    public static abstract class Oipa extends Upload {
-      public static FromFile from( File file ) {
-         return new FromFile( file );
-      }
-
-      public static class FromFile extends Oipa {
+      public static class App extends Oipa {
          private final File file;
 
-         public FromFile( File file ) {
+         public App( File file ) {
             this.file = file;
+         }
+
+         @Override
+         public <T> T accept( Visitor<T> visitor ) {
+            return visitor.visit( this );
+         }
+
+         @Override
+         public Preview preview() {
+            return new Preview() {
+               @Override
+               public List<AetherCoordinates> all() {
+                  return Stream.concat( Arrays.asList( war().artifact(), classes().artifact() ).stream().map( a -> AetherCoordinates.from( a ) ),
+                        libs().artifacts().stream().map( a -> AetherCoordinates.from( a ) ) )
+                        .collect( Collectors.toList() );
+               }
+
+               @Override
+               public War.Classes classes() {
+                  return new War.Classes( file, deployments(),
+                        AetherCoordinates.empty()
+                              .withArtifactId( "pas.web" )
+                              .withGroupId( "com.adminserver" )
+                              .withPackaging( "jar" )
+                              .withVersion( version().toString() ) );
+               }
+
+               private AetherDeployments deployments() {
+                  return new AetherDeployments.Default( Repos.pasExtRepo() );
+               }
+
+               private Version.InsideProps inside() {
+                  return new Version.InsideProps( file, "WEB-INF/classes/Configuration.properties", "application.buildversion" );
+               }
+
+               @Override
+               public War.Libs libs() {
+                  return new War.Libs( file, deployments() )
+                        .where( new FileEndsWith( String.format( "%s.jar", version().toString() ) ) );
+               }
+
+               @Override
+               public Boolean valid() {
+                  return inside().exists();
+               }
+
+               @Override
+               public Version version() {
+                  return new Version() {
+                     @Override
+                     public String version() {
+                        return inside().value().orElseThrow( ( ) -> new RuntimeException( String.format( "Failed to get OIPA version from archive: %s", file.getAbsolutePath() ) ) );
+                     }
+                  };
+               }
+
+               @Override
+               public Upload._File war() {
+                  return Upload.file( file, deployments(),
+                        AetherCoordinates.empty()
+                              .withArtifactId( "PASJava" )
+                              .withGroupId( "com.adminserver" )
+                              .withPackaging( "war" )
+                              .withVersion( version().toString() ) );
+               }
+            };
+         }
+
+         @Override
+         public String toString() {
+            return String.format( "OIPA %s => %s", version(), file.getAbsolutePath() );
          }
 
          @Override
@@ -223,97 +287,143 @@ public abstract class Upload {
             preview().libs().upload();
          }
 
-         private File file() {
-            final Supplier<List<File>> files = ( ) -> new Array<File>( file.listFiles() );
-            final Predicate<File> warOnly = ( file ) -> file.getName().endsWith( ".war" );
-            final Supplier<Stream<File>> wars = ( ) -> files.get().stream().filter( warOnly );
-            final Supplier<File> fromDir = ( ) -> {
-               Validate.isTrue( wars.get().count() <= 1, "More than one war file was found in directory: %s", file.getAbsolutePath() );
-               return wars.get().findFirst().orElseThrow( ( ) -> new RuntimeException( String.format( "No war files found in directory: %s", file.getAbsolutePath() ) ) );
-            };
-            Validate.isTrue( file.exists(), "%s does not exist", file.getAbsolutePath() );
-            return file.isFile() ? file : fromDir.get();
+         @Override
+         public Version version() {
+            return preview().version();
+         }
+      }
+
+      public static abstract class From {
+         public static class _File extends From {
+            private final File file;
+
+            public _File( File file ) {
+               this.file = file;
+            }
+
+            private Stream<File> files() {
+               final Supplier<List<File>> files = ( ) -> new Array<File>( file.listFiles() );
+               final Predicate<File> warOnly = ( file ) -> file.isFile() && file.getName().endsWith( ".war" );
+               final Supplier<Stream<File>> wars = ( ) -> files.get().stream().filter( warOnly );
+               Validate.isTrue( file.exists(), "%s does not exist", file.getAbsolutePath() );
+               return file.isFile() ? Stream.of( file ) : wars.get();
+            }
+
+            private Oipa upload( File file ) {
+               return new App( file ).valid()
+                     ? new App( file )
+                     : new Palette( file ).valid()
+                           ? new Palette( file )
+                           : new Unknown( file );
+            }
+
+            @Override
+            public Stream<Oipa> uploads() {
+               return files().map( this::upload );
+            }
+         }
+
+         public abstract Stream<Oipa> uploads();
+      }
+
+      public static class Palette extends Oipa {
+         private final File file;
+
+         public Palette( File file ) {
+            this.file = file;
          }
 
          @Override
-         public Version.FromFile version() {
-            return new Version.FromFile( file() );
+         public <T> T accept( Visitor<T> visitor ) {
+            return visitor.visit( this );
          }
 
          @Override
          public Preview preview() {
-            return Preview.from( file() );
+            return new Preview() {
+               @Override
+               public List<AetherCoordinates> all() {
+                  return Stream.concat( Arrays.asList( war().artifact(), classes().artifact() ).stream().map( a -> AetherCoordinates.from( a ) ),
+                        libs().artifacts().stream().map( a -> AetherCoordinates.from( a ) ) )
+                        .collect( Collectors.toList() );
+               }
+
+               @Override
+               public War.Classes classes() {
+                  return new War.Classes( file, deployments(),
+                        AetherCoordinates.empty()
+                              .withArtifactId( "palette.web" )
+                              .withGroupId( "com.adminserver" )
+                              .withPackaging( "jar" )
+                              .withVersion( version().toString() ) );
+               }
+
+               private AetherDeployments deployments() {
+                  return new AetherDeployments.Default( Repos.pasExtRepo() );
+               }
+
+               private Version.InsideProps inside() {
+                  return new Version.InsideProps( file, "WEB-INF/classes/oracle/insurance/palette/messages/login/Messages.properties", "buildversion" );
+               }
+
+               @Override
+               public War.Libs libs() {
+                  return new War.Libs( file, deployments() )
+                        .where( new FileEndsWith( String.format( "%s.jar", version().toString() ) ) );
+               }
+
+               @Override
+               public Boolean valid() {
+                  return inside().exists();
+               }
+
+               @Override
+               public Version version() {
+                  return new Version() {
+                     @Override
+                     public String version() {
+                        return inside().value().orElseThrow( ( ) -> new RuntimeException( String.format( "Failed to get OIPA Palette version from archive: %s", file.getAbsolutePath() ) ) );
+                     }
+                  };
+               }
+
+               @Override
+               public Upload._File war() {
+                  return Upload.file( file, deployments(),
+                        AetherCoordinates.empty()
+                              .withArtifactId( "PaletteConfig" )
+                              .withGroupId( "com.adminserver" )
+                              .withPackaging( "war" )
+                              .withVersion( version().toString() ) );
+               }
+            };
+         }
+
+         @Override
+         public String toString() {
+            return String.format( "Palette %s => %s", version(), file.getAbsolutePath() );
+         }
+
+         @Override
+         public void upload() {
+            preview().war().upload();
+            preview().classes().upload();
+            preview().libs().upload();
+         }
+
+         @Override
+         public Version version() {
+            return preview().version();
          }
       }
 
-      public abstract Version version();
-
-      public abstract Preview preview();
-
       public static abstract class Preview {
-         public static FromFile from( File file ) {
-            return new FromFile( file );
-         }
 
-         public static class FromFile extends Preview {
-            private final File file;
-
-            public FromFile( File file ) {
-               this.file = file;
-            }
-
-            private AetherDeployments deployments() {
-               return new AetherDeployments.Default( Repos.pasExtRepo() );
-            }
-
-            @Override
-            public List<AetherCoordinates> all() {
-               return Stream.concat( Arrays.asList( war().artifact(), classes().artifact() ).stream().map( a -> AetherCoordinates.from( a ) ),
-                     libs().artifacts().stream().map( a -> AetherCoordinates.from( a ) ) )
-                     .collect( Collectors.toList() );
-            }
-
-            @Override
-            public Version.FromFile version() {
-               return Version.from( file );
-            }
-
-            @Override
-            public Upload._File war() {
-               return Upload.file( file, deployments(),
-                     AetherCoordinates.empty()
-                           .withArtifactId( "PASJava" )
-                           .withGroupId( "com.adminserver" )
-                           .withPackaging( "war" )
-                           .withVersion( version().toString() ) );
-            }
-
-            @Override
-            public War.Classes classes() {
-               return new War.Classes( file, deployments(),
-                     AetherCoordinates.empty()
-                           .withArtifactId( "pas.web" )
-                           .withGroupId( "com.adminserver" )
-                           .withPackaging( "jar" )
-                           .withVersion( version().toString() ) );
-            }
-
-            @Override
-            public War.Libs libs() {
-               return new War.Libs( file, deployments() )
-                     .where( new FileEndsWith( String.format( "%s.jar", version().toString() ) ) );
-            }
-         }
-
-         public abstract Upload._File war();
+         public abstract List<AetherCoordinates> all();
 
          public abstract War.Classes classes();
 
          public abstract War.Libs libs();
-
-         public abstract List<AetherCoordinates> all();
-         
-         public abstract Version version();
 
          @Override
          public String toString() {
@@ -321,22 +431,96 @@ public abstract class Upload {
                   ? "[No Artifacts]"
                   : all().stream().map( c -> c.toString() ).collect( Collectors.joining( "\n" ) );
          }
+
+         public abstract Boolean valid();
+
+         public abstract Version version();
+
+         public abstract Upload._File war();
+      }
+
+      public static class Unknown extends Oipa {
+         private final File file;
+
+         public Unknown( File file ) {
+            this.file = file;
+         }
+
+         @Override
+         public <T> T accept( Visitor<T> visitor ) {
+            return visitor.visit( this );
+         }
+
+         @Override
+         public Preview preview() {
+            return new Preview() {
+               @Override
+               public List<AetherCoordinates> all() {
+                  return new ArrayList<AetherCoordinates>();
+               }
+
+               @Override
+               public Upload.War.Classes classes() {
+                  throw new RuntimeException( String.format( "Unknown OIPA file: %s", file.getAbsolutePath() ) );
+               }
+
+               @Override
+               public Upload.War.Libs libs() {
+                  throw new RuntimeException( String.format( "Unknown OIPA file: %s", file.getAbsolutePath() ) );
+               }
+
+               @Override
+               public Boolean valid() {
+                  return true;
+               }
+
+               @Override
+               public Version version() {
+                  return new Version() {
+                     @Override
+                     public String version() {
+                        return "NA";
+                     }
+                  };
+               }
+
+               @Override
+               public _File war() {
+                  throw new RuntimeException( String.format( "Unknown OIPA file: %s", file.getAbsolutePath() ) );
+               }
+            };
+         }
+
+         @Override
+         public void upload() {}
+
+         @Override
+         public Version version() {
+            return preview().version();
+         }
       }
 
       public static abstract class Version {
-         /** War file or Exploded War */
-         public static class FromFile extends Version {
+         public static class InsideProps {
             private final File file;
+            private final String path;
+            private final String prop;
 
-            public FromFile( File file ) {
+            public InsideProps( File file, String path, String prop ) {
                this.file = file;
+               this.path = path;
+               this.prop = prop;
             }
 
             private Support.Archive.Extract.ByPath.Default entry() {
-               return Support.Archive.of( file ).extract().path( "WEB-INF/classes/Configuration.properties" );
+               return Support.Archive.of( file ).extract().path( path );
             }
 
-            private Properties props() {
+            public Boolean exists() {
+               return value().isPresent();
+            }
+
+            public Optional<Properties> props() {
                final Function<InputStream, Properties> toProps = ( is ) -> {
                   try {
                      final Properties result = new Properties();
@@ -348,18 +532,12 @@ public abstract class Upload {
                   }
                };
 
-               return entry().toStream().map( toProps )
-                     .orElseThrow( ( ) -> new RuntimeException( String.format( "Failed to get OIPA version from archive: %s", file.getAbsolutePath() ) ) );
+               return entry().toStream().map( toProps );
             }
 
-            @Override
-            public String version() {
-               return props().getProperty( "application.buildversion" );
+            public Optional<String> value() {
+               return props().map( props -> props.getProperty( prop ) );
             }
-         }
-
-         public static FromFile from( File file ) {
-            return new FromFile( file );
          }
 
          @Override
@@ -369,26 +547,31 @@ public abstract class Upload {
 
          public abstract String version();
       }
+
+      public static interface Visitor<T> {
+         public abstract T visit( App oipa );
+
+         public abstract T visit( Palette oipa );
+
+         public abstract T visit( Unknown oipa );
+      }
+
+      public static From._File from( File file ) {
+         return new From._File( file );
+      }
+
+      public abstract <T> T accept( Visitor<T> visitor );
+
+      public abstract Preview preview();
+
+      public Boolean valid() {
+         return preview().valid();
+      }
+
+      public abstract Version version();
    }
 
    public static abstract class Support {
-      public static interface Filter {
-         public static class FileEndsWith implements Filter {
-            private final String str;
-
-            public FileEndsWith( String str ) {
-               this.str = str;
-            }
-
-            @Override
-            public boolean accept( File file ) {
-               return file.getName().endsWith( str );
-            }
-         }
-
-         boolean accept( File file );
-      }
-
       public static abstract class Archive {
          public static class Default extends Archive {
             private final File file;
@@ -469,6 +652,23 @@ public abstract class Upload {
             return new Default( file );
          }
       }
+
+      public static interface Filter {
+         public static class FileEndsWith implements Filter {
+            private final String str;
+
+            public FileEndsWith( String str ) {
+               this.str = str;
+            }
+
+            @Override
+            public boolean accept( File file ) {
+               return file.getName().endsWith( str );
+            }
+         }
+
+         boolean accept( File file );
+      }
    }
 
    public static abstract class War extends Upload {
@@ -483,11 +683,8 @@ public abstract class Upload {
             this.coords = coords;
          }
 
-         private <T> T fromExploded( Function<ExplodedWar.Classes, T> func ) {
-            final File extracted = new Unzip.Temp( file ).unzip();
-            final T result = func.apply( new ExplodedWar.Classes( extracted, deployments, coords ) );
-            new DeleteFile.Quietly( extracted ).delete();
-            return result;
+         public Artifact artifact() {
+            return fromExploded( e -> e.artifact() );
          }
 
          private void exploded( Consumer<ExplodedWar.Classes> consumer ) {
@@ -497,8 +694,11 @@ public abstract class Upload {
             } );
          }
 
-         public Artifact artifact() {
-            return fromExploded( e -> e.artifact() );
+         private <T> T fromExploded( Function<ExplodedWar.Classes, T> func ) {
+            final File extracted = new Unzip.Temp( file ).unzip();
+            final T result = func.apply( new ExplodedWar.Classes( extracted, deployments, coords ) );
+            new DeleteFile.Quietly( extracted ).delete();
+            return result;
          }
 
          @Override
@@ -526,19 +726,19 @@ public abstract class Upload {
             return fromExploded( l -> l.artifacts() );
          }
 
+         private void exploded( Consumer<ExplodedWar.Libs> consumer ) {
+            fromExploded( l -> {
+               consumer.accept( l );
+               return true;
+            } );
+         }
+
          private <T> T fromExploded( Function<ExplodedWar.Libs, T> func ) {
             final File extracted = new Unzip.Temp( file ).unzip();
             // new ExplodedWar.Libs( extracted, deployments, filters ).upload();
             final T result = func.apply( new ExplodedWar.Libs( extracted, deployments, filters ) );
             new DeleteFile.Quietly( extracted ).delete();
             return result;
-         }
-
-         private void exploded( Consumer<ExplodedWar.Libs> consumer ) {
-            fromExploded( l -> {
-               consumer.accept( l );
-               return true;
-            } );
          }
 
          @Override
@@ -550,6 +750,10 @@ public abstract class Upload {
             return new Libs( file, deployments, filters.with( filter ) );
          }
       }
+   }
+
+   public static _File file( File file, AetherDeployments deployments, AetherCoordinates coords ) {
+      return new _File( file, deployments, coords );
    }
 
    public abstract void upload();
