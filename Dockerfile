@@ -14,14 +14,21 @@ ENV DB_NAME=OIPA_GA
 ENV DB_USER=sqlUser
 ENV DB_PASSWORD=sqlUser1
 ENV DB_PORT=1433
+ENV IVS_DB_NAME=OIPA_IVS
 
 COPY server.xml /config/
 RUN installUtility install --acceptLicense defaultServer
 
 # Install OIPA
 ARG OIPA_VERSION=10.2.0.30
-# ENV OIPA_VERSION=10.2.0.30
 RUN curl --fail -o /config/apps/PASJava.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PASJava/${OIPA_VERSION}/PASJava-${OIPA_VERSION}.war
+
+# Install Palette
+ARG PALETTE_VERSION=10.1.2.1
+RUN curl --fail -o /config/apps/PaletteConfig.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PaletteConfig/${PALETTE_VERSION}/PaletteConfig-${PALETTE_VERSION}.war
+RUN mkdir -p /uploads
+COPY palette/uploads/ /uploads/
+
 
 # Config
 COPY shared/ /opt/ibm/wlp/usr/shared/

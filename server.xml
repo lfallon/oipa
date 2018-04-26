@@ -53,6 +53,9 @@
     <webApplication contextRoot="PASJava" name="OIPA" autoStart="true" type="war"	location="PASJava.war">
 		    <classloader delegation="parentFirst" privateLibraryRef="OIPA_LIBS, MSJDBCLib, global" />
     </webApplication>
+    <webApplication contextRoot="PaletteConfig" name="PALETTE" autoStart="true" type="war"	location="PaletteConfig.war">
+		    <classloader delegation="parentFirst" privateLibraryRef="OIPA_LIBS, MSJDBCLib, global" />
+    </webApplication>
 
     <dataSource id="AdminServer" jndiName="ADMINSERVERDS" type="javax.sql.DataSource">
         <jdbcDriver libraryRef="MSJDBCLib"
