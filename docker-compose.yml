@@ -29,6 +29,28 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=sa
       - DB_PASSWORD=SQLServerPass1
+      - IVS_DB_NAME=${IVS_DB_NAME}
+
+  palette:
+    build:
+      context: .
+      dockerfile: Dockerfile.palette
+    entrypoint: /bin/bash
+    tty: true
+    links:
+      - db
+      - oipa
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    devices:
+      - "/dev/snd"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - IVS_DB_NAME=${IVS_DB_NAME}
+      - DB_USER=sa
+      - DB_PASSWORD=SQLServerPass1
+      - DISPLAY=unix$DISPLAY
 
 volumes:
   db-data:

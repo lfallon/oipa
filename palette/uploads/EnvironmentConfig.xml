@@ -1,6 +1,6 @@
 <root>
 	<PaletteProperties>
-		<PaletteVersion>10.1.2.1</PaletteVersion>
+		<PaletteVersion>10.2.0.0</PaletteVersion>
 		<NBU>No</NBU>
 		<PasEnvType>Development</PasEnvType>
 		<PasConfigCacheClear>off</PasConfigCacheClear>
@@ -10,15 +10,15 @@
 		<PasDatabaseType>SQLServer</PasDatabaseType>
 		<PasDatabaseServer>db</PasDatabaseServer>
 		<PasDatabasePort>1433</PasDatabasePort>
-		<PasDatabaseName>OIPA_POC</PasDatabaseName>
-		<PasDatabaseUrl>jdbc:jtds:sqlserver://db/OIPA_POC;prepareSQL=2</PasDatabaseUrl>
+		<PasDatabaseName>OIPA_Sandbox</PasDatabaseName>
+		<PasDatabaseUrl>jdbc:jtds:sqlserver://db/OIPA_Sandbox;prepareSQL=2</PasDatabaseUrl>
 		<PasDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</PasDatabaseDriverClass>
 		<PasJNDILookup>No</PasJNDILookup>
 		<IvsDatabaseType>SQLServer</IvsDatabaseType>
 		<IvsDatabaseServer>db</IvsDatabaseServer>
 		<IvsDatabasePort>1433</IvsDatabasePort>
 		<IvsDatabaseName>OIPA_IVS</IvsDatabaseName>
-		<IvsEnv>DEV</IvsEnv>
+		<IvsEnv>sandbox</IvsEnv>
 		<IvsTrackNumber>1</IvsTrackNumber>
 		<IvsSequence>44</IvsSequence>
 		<IvsDatabaseUrl>jdbc:jtds:sqlserver://db/OIPA_IVS;prepareSQL=2</IvsDatabaseUrl>

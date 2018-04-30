@@ -1,0 +1,17 @@
+FROM jboss/base-jdk:7
+
+ARG VERSION=20180426T152435Z-001
+
+RUN curl -sSL "http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/RulesPalette/${VERSION}/RulesPalette-${VERSION}.zip" -o RulesPalette.zip
+RUN unzip RulesPalette.zip
+
+WORKDIR RulesPalette
+
+ENTRYPOINT [ "bin/asgraphicruleside", "--jdkhome", "$JAVA_HOME" ]
+
+
+# Build
+# docker build -t local/palette -f Dockerfile.palette .
+
+# Run
+# docker run -it --rm -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name palette local/palette
