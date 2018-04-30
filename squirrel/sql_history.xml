@@ -1,0 +1,21 @@
+<Beans>
+    <Bean Class="net.sourceforge.squirrel_sql.client.session.mainpanel.SQLHistory">
+        <data Indexed="true">
+            <Bean Class="net.sourceforge.squirrel_sql.client.session.mainpanel.SQLHistoryItem">
+                <SQL>select policynumber from aspolicy</SQL>
+                <aliasName>OIPA</aliasName>
+                <lastUsageTime Class="java.util.Date">
+                    <date>30</date>
+                    <day>1</day>
+                    <hours>20</hours>
+                    <minutes>36</minutes>
+                    <month>3</month>
+                    <seconds>39</seconds>
+                    <time>1525120599594</time>
+                    <timezoneOffset>0</timezoneOffset>
+                    <year>118</year>
+                </lastUsageTime>
+            </Bean>
+        </data>
+    </Bean>
+</Beans>

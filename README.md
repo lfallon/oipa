@@ -39,6 +39,7 @@ make push
     ```
 5. Run Docker Compose to start the app
     ```
+    docker-compose pull
     export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && \
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
     ```
@@ -112,3 +113,16 @@ docker logs -f oipa
 * Get the version
 * Upload Artifacts
 * Preview Artifacts that will be uploaded?
+
+
+# Squirrel Client
+```
+xhost +
+docker run --rm -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY dyokomizo/squirrel
+```
+
+## Experiments
+Using more secure way to display on client (not working):
+```
+docker run --rm -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth dyokomizo/squirrel
+```

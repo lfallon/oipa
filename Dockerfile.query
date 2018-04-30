@@ -1,0 +1,42 @@
+FROM dyokomizo/squirrel
+
+RUN apt-get update && apt-get install maven -y
+
+ARG SQUIRREL_HOME=/opt/squirrel-sql-3.7
+
+# PostgreSQL
+RUN mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:copy \
+  -DrepoUrl=https://repo.maven.apache.org/maven2/ \
+  -Dartifact=org.postgresql:postgresql:9.4-1202-jdbc4:jar \
+  -Dtransitive=false \
+  -DoutputDirectory=$SQUIRREL_HOME/lib
+
+# H2
+RUN mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:copy \
+  -DrepoUrl=https://repo.maven.apache.org/maven2/ \
+  -Dartifact=com.h2database:h2:1.4.186:jar \
+  -Dtransitive=false \
+  -DoutputDirectory=$SQUIRREL_HOME/lib
+
+# SQL Server
+RUN mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:copy \
+  -DrepoUrl=https://repo.maven.apache.org/maven2/ \
+  -Dartifact=net.sourceforge.jtds:jtds:1.3.1:jar \
+  -Dtransitive=false \
+  -DoutputDirectory=$SQUIRREL_HOME/lib
+
+# Aliases
+RUN mkdir -p /root/.squirrel-sql
+COPY squirrel/ /root/.squirrel-sql/
+
+# Start Script
+RUN mkdir -p /scripts
+WORKDIR /scripts
+RUN (echo "#!/bin/sh"; echo "/opt/squirrel-sql-3.7/squirrel-sql.sh") > run.sh
+RUN chmod 755 run.sh
+
+CMD ["/scripts/run.sh"]
+
+
+# docker build -t local/query -f Dockerfile.query .
+# docker run --rm -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name query local/query

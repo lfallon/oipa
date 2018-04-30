@@ -12,7 +12,7 @@ services:
       - 1433:1433
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=SQLServerPass1
+      - SA_PASSWORD=${DB_PASSWORD}
 
   oipa:
     build:
@@ -20,6 +20,8 @@ services:
       dockerfile: Dockerfile
     links:
       - db
+    volumes:
+      - ./env/logs:/logs
     ports:
       - 9080:9080
       - 9443:9443
@@ -28,7 +30,7 @@ services:
       - DB_HOST=db
       - DB_NAME=${DB_NAME}
       - DB_USER=sa
-      - DB_PASSWORD=SQLServerPass1
+      - DB_PASSWORD=${DB_PASSWORD}
       - IVS_DB_NAME=${IVS_DB_NAME}
 
   palette:
@@ -49,7 +51,22 @@ services:
       - DB_NAME=${DB_NAME}
       - IVS_DB_NAME=${IVS_DB_NAME}
       - DB_USER=sa
-      - DB_PASSWORD=SQLServerPass1
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DISPLAY=unix$DISPLAY
+
+  query:
+    build:
+      context: .
+      dockerfile: Dockerfile.query
+    entrypoint: /bin/bash
+    tty: true
+    links:
+      - db
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    devices:
+      - "/dev/snd"
+    environment:
       - DISPLAY=unix$DISPLAY
 
 volumes:

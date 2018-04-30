@@ -1,0 +1,19 @@
+<Beans>
+    <Bean Class="net.sourceforge.squirrel_sql.client.gui.db.AliasFolderState">
+        <aliasIdentifier/>
+        <expanded>true</expanded>
+        <folderName>JTree</folderName>
+        <kids Indexed="true">
+            <Bean Class="net.sourceforge.squirrel_sql.client.gui.db.AliasFolderState">
+                <aliasIdentifier Class="net.sourceforge.squirrel_sql.fw.id.UidIdentifier">
+                    <string>5a5744d3:16318448b24:-7fc1</string>
+                </aliasIdentifier>
+                <expanded>false</expanded>
+                <folderName/>
+                <kids Indexed="true"/>
+                <selected>true</selected>
+            </Bean>
+        </kids>
+        <selected>false</selected>
+    </Bean>
+</Beans>
