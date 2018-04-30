@@ -29,7 +29,7 @@ RUN mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:copy \
 RUN mkdir -p /root/.squirrel-sql
 COPY squirrel/ /root/.squirrel-sql/
 
-# Start Script
+# Run Script
 RUN mkdir -p /scripts
 WORKDIR /scripts
 RUN (echo "#!/bin/sh"; echo "/opt/squirrel-sql-3.7/squirrel-sql.sh") > run.sh

@@ -29,7 +29,6 @@ RUN curl --fail -o /config/apps/PaletteConfig.war -O http://repo.pennassuranceso
 RUN mkdir -p /uploads
 COPY palette/uploads/ /uploads/
 
-
 # Config
 COPY shared/ /opt/ibm/wlp/usr/shared/
 

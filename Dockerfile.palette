@@ -2,12 +2,26 @@ FROM jboss/base-jdk:7
 
 ARG VERSION=20180426T152435Z-001
 
-RUN curl -sSL "http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/RulesPalette/${VERSION}/RulesPalette-${VERSION}.zip" -o RulesPalette.zip
+ENV URL=http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/RulesPalette/${VERSION}/RulesPalette-${VERSION}.zip
+RUN echo Download: $URL
+RUN curl -sSL "$URL" -o RulesPalette.zip
 RUN unzip RulesPalette.zip
 
 WORKDIR RulesPalette
 
-ENTRYPOINT [ "bin/asgraphicruleside", "--jdkhome", "$JAVA_HOME" ]
+RUN rm -Rf ./PaletteEnvironments/RulesIDE/*
+COPY palette/environments/ /opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/
+
+RUN rm -Rf ./etc/*
+COPY palette/etc/ /opt/jboss/RulesPalette/etc/
+
+# Run Script
+RUN mkdir -p /opt/jboss/scripts
+WORKDIR /opt/jboss/scripts
+RUN (echo "#!/bin/sh"; echo "(cd /opt/jboss/RulesPalette && bin/asgraphicruleside)") > run.sh
+RUN chmod 755 run.sh
+
+ENTRYPOINT [ "/opt/jboss/scripts/run.sh" ]
 
 
 # Build

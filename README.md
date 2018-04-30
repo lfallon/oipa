@@ -121,6 +121,12 @@ xhost +
 docker run --rm -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY dyokomizo/squirrel
 ```
 
+## After Docker Compose
+```
+xhost +
+docker-compose exec query ./run.sh
+```
+
 ## Experiments
 Using more secure way to display on client (not working):
 ```
