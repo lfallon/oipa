@@ -10,7 +10,10 @@ RUN unzip RulesPalette.zip
 WORKDIR RulesPalette
 
 RUN rm -Rf ./PaletteEnvironments/RulesIDE/*
-COPY palette/environments/ /opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/
+RUN mkdir -p ./PaletteEnvironments/RulesIDE/configuration
+COPY palette/environments/configuration/ /opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/configuration/
+RUN mkdir -p ./PaletteEnvironments/RulesIDE/DOCKER
+COPY palette/environments/DOCKER/ /opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/DOCKER/
 
 RUN rm -Rf ./etc/*
 COPY palette/etc/ /opt/jboss/RulesPalette/etc/
