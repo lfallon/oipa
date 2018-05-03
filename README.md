@@ -190,3 +190,15 @@ SQL Client.
 ```
 xhost + && docker-compose exec query ./run.sh
 ```
+
+# Eclipse
+Once you have setup your application you will be able to run Eclipse in that environment. Navigate
+to the `oipa` directory you cloned from git earlier and run the following command to start Eclipse.
+```
+xhost + && docker-compose exec eclipse ./run.sh
+```
+
+## Build Extensions
+```
+docker-compose restart oipa
+```

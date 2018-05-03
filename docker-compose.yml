@@ -69,5 +69,26 @@ services:
     environment:
       - DISPLAY=unix$DISPLAY
 
+  eclipse:
+    build:
+      context: .
+      dockerfile: Dockerfile.eclipse
+    entrypoint: /bin/bash
+    tty: true
+    links:
+      - db
+      - oipa
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./env/eclipse/workspace:/home/developer/eclipse-workspace
+      - ./env/eclipse/prefs:/home/developer/.eclipse
+      - ./env/eclipse/m2:/home/developer/.m2
+      - ./env/eclipse/git:/home/developer/git
+    devices:
+      - "/dev/snd"
+    environment:
+      - DISPLAY=unix$DISPLAY
+
+
 volumes:
   db-data:

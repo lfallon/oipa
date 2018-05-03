@@ -1,0 +1,18 @@
+FROM openkbs/eclipse-oxygen-docker
+
+VOLUME ${HOME}/.m2
+VOLUME ${HOME}/git
+
+# Run Script
+RUN mkdir -p ${HOME}/scripts
+WORKDIR ${HOME}/scripts
+RUN (echo "#!/bin/sh"; echo "/opt/eclipse/eclipse") > ${HOME}/scripts/run.sh
+RUN chmod 755 ${HOME}/scripts/run.sh
+
+RUN pwd
+
+CMD ["${HOME}/scripts/run.sh"]
+
+
+# docker build -t local/eclipse -f Dockerfile.eclipse .
+# mkdir -p /tmp/ws && chmod 777 /tmp/ws && mkdir -p /tmp/.eclipse && chmod 777 /tmp/.eclipse && docker run -it --rm -v /tmp/ws:/home/developer/eclipse-workspace -v /tmp/.eclipse:/home/developer/.eclipse -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name eclipse openkbs/eclipse-oxygen-docker
