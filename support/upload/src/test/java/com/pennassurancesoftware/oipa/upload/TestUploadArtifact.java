@@ -34,7 +34,7 @@ public class TestUploadArtifact {
 		return (warFile) -> System.out.println(oipaVersion(warFile));
 	}
 
-	@Test(groups = "integration", enabled = false)
+	@Test(groups = "integration", enabled = true)
 	public void test_upload_oipa() throws Exception {
 		Upload.Oipa.from(oipaFolder()).uploads().forEach(u -> u.upload());
 	}
