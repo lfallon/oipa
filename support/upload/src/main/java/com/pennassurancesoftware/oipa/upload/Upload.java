@@ -20,6 +20,7 @@ import java.util.stream.StreamSupport;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.aether.artifact.Artifact;
@@ -31,6 +32,7 @@ import com.jcabi.immutable.Array;
 import com.pennassurancesoftware.oipa.upload.Upload.Support.Filter.FileEndsWith;
 import com.pennassurancesoftware.oipa.upload.aether.AetherCoordinates;
 import com.pennassurancesoftware.oipa.upload.aether.AetherDeployments;
+import com.pennassurancesoftware.oipa.upload.util.Archives;
 import com.pennassurancesoftware.oipa.upload.util.DeleteFile;
 import com.pennassurancesoftware.oipa.upload.util.Unzip;
 import com.pennassurancesoftware.oipa.upload.util.Zip;
@@ -262,10 +264,19 @@ public abstract class Upload {
                      }
                   };
                }
+               
+               private Archives.Default archive() {
+                  return Archives.of( file );
+               }
+               
+               // Remove the debugger from the libs directory if it is present
+               private Archives.Default transformed() {
+                  return archive().transformer().filterBy( e -> !FilenameUtils.getBaseName( e ).startsWith( "debugger" ) ).transform();
+               }
 
                @Override
                public Upload._File war() {
-                  return Upload.file( file, deployments(),
+                  return Upload.file( transformed().file(), deployments(),
                         AetherCoordinates.empty()
                               .withArtifactId( "PASJava" )
                               .withGroupId( "com.adminserver" )
