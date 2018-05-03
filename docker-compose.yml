@@ -89,6 +89,18 @@ services:
     environment:
       - DISPLAY=unix$DISPLAY
 
+  jd:
+    build:
+      context: .
+      dockerfile: Dockerfile.jd
+    entrypoint: /bin/bash
+    tty: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    devices:
+      - "/dev/snd"
+    environment:
+      - DISPLAY=unix$DISPLAY
 
 volumes:
   db-data:

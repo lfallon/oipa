@@ -2,6 +2,7 @@ FROM openkbs/eclipse-oxygen-docker
 
 VOLUME ${HOME}/.m2
 VOLUME ${HOME}/git
+VOLUME ${HOME}/extensions
 
 # Run Script
 RUN mkdir -p ${HOME}/scripts
@@ -9,7 +10,10 @@ WORKDIR ${HOME}/scripts
 RUN (echo "#!/bin/sh"; echo "/opt/eclipse/eclipse") > ${HOME}/scripts/run.sh
 RUN chmod 755 ${HOME}/scripts/run.sh
 
-RUN pwd
+ENV OIPA_TOOLS_SOURCE=${HOME}/git/oipa-tools
+ENV DEBUGGER_SOURCE=${OIPA_TOOLS_SOURCE}/debugger-v10
+RUN (echo "#!/bin/sh"; echo "(cd ${DEBUGGER_SOURCE} && mvn clean install && cp ${DEBUGGER_SOURCE}/dist/debugger-v10-*.jar ${HOME}/extensions && cp ${DEBUGGER_SOURCE}/src/main/config/extensions.xml ${HOME}/extensions)") > ${HOME}/scripts/build.sh
+RUN chmod 755 ${HOME}/scripts/build.sh
 
 CMD ["${HOME}/scripts/run.sh"]
 
