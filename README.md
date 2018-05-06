@@ -212,7 +212,13 @@ xhost + && docker-compose exec eclipse /home/developer/scripts/run.sh
 ```
 
 ## Build Extensions
-Work in progress...
+
+### Start In Developer Mode
+```
+export DB_NAME=OIPA_SandBox && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+### Rebuild Extensions
 ```
 docker-compose exec eclipse /home/developer/scripts/build.sh && \
 docker-compose restart oipa

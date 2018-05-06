@@ -1,3 +1,37 @@
+FROM openjdk:8-jdk AS BOOTSTRAP
+
+# ----
+# Install Maven
+RUN apt-get install curl tar bash
+ARG MAVEN_VERSION=3.3.9
+ARG USER_HOME_DIR="/root"
+RUN mkdir -p /usr/share/maven && \
+curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar -xzC /usr/share/maven --strip-components=1 && \
+ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+ENV MAVEN_HOME /usr/share/maven
+ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+# Source And Target
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+ADD support/maven-settings.xml $MAVEN_CONFIG/settings.xml
+
+# Resolve Dependencies
+COPY support/bootstrap/pom.xml /usr/src/app/
+RUN mvn --fail-never -B dependency:resolve
+
+# Build And Install
+COPY support/bootstrap/ ./
+RUN mvn clean install
+
+# Target
+RUN mkdir -p /installs
+RUN cp dist/*deb /installs
+
+# =============================================================================================================================================
+
 FROM websphere-liberty:kernel
 
 RUN apt-get update && apt-get install -y curl
@@ -39,6 +73,11 @@ RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
 COPY extensions.xml /extensions/
 VOLUME /extensions
+
+# Bootstrap
+RUN mkdir -p /installs
+COPY --from=BOOTSTRAP /installs/ /installs/
+RUN cd /installs && dpkg -i *.deb
 
 CMD ["/opt/ibm/wlp/bin/server", "run", "defaultServer"]
 

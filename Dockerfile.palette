@@ -17,6 +17,7 @@ COPY palette/environments/DOCKER/ /opt/jboss/RulesPalette/PaletteEnvironments/Ru
 
 RUN rm -Rf ./etc/*
 COPY palette/etc/ /opt/jboss/RulesPalette/etc/
+RUN chmod 755 /opt/jboss/RulesPalette/bin/asgraphicruleside
 
 # Run Script
 RUN mkdir -p /opt/jboss/scripts

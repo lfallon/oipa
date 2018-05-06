@@ -3,7 +3,7 @@ Version: [[version]]
 Section: misc
 Priority: optional
 Architecture: all
-Depends: openjdk-8-jre | sun-java8-jre | openjdk-9-jre | sun-java9-jre | ibm-java-sdk-8 | ibm-java-jre-8
+Depends: 
 Maintainer: Jerome Bridge <jeromebridge@pennassurancesoftware.com>
 Description: OIPA Bootstrap Command Line Interface
 Distribution: development
