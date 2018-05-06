@@ -1,0 +1,27 @@
+FROM picoded/ubuntu-openjdk-8-jdk
+
+RUN apt-get update && apt-get install curl xdg-utils -y
+
+# Install Java Decompiler
+ARG JD_VERSION=1.4.0
+RUN mkdir -p /opt/jd
+RUN curl -sSL "https://github.com/java-decompiler/jd-gui/releases/download/v1.4.0/jd-gui-${JD_VERSION}.jar" -o /opt/jd/jd-gui.jar
+
+# Download Archives
+RUN mkdir -p /archives
+WORKDIR /archives
+
+ARG OIPA_VERSION=10.2.0.30
+RUN curl --fail -o /archives/PASJava.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PASJava/${OIPA_VERSION}/PASJava-${OIPA_VERSION}.war
+
+RUN mkdir -p /scripts
+WORKDIR /scripts
+RUN (echo "#!/bin/sh"; echo "java -jar /opt/jd/jd-gui.jar /archives/PASJava.war") > run.sh
+RUN chmod 755 run.sh
+
+CMD ["/scripts/run.sh"]
+
+# java -jar /opt/jd/jd-gui.jar PASJava.war
+
+# docker build -t local/jd -f Dockerfile.jd .
+# docker run --rm -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name jd local/jd

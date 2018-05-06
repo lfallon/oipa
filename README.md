@@ -176,6 +176,11 @@ docker run --rm -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/
    export DB_NAME=OIPA_SandBox && docker-compose up
    ```
 
+   Run the following to build extensions locally:
+   ```
+   export DB_NAME=OIPA_SandBox && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+   ```
+
 # Palette
 Once you have setup your application you will be able to run the Palette in that environment. Navigate
 to the `oipa` directory you cloned from git earlier and run the following command to start the Palette.
@@ -189,4 +194,26 @@ to the `oipa` directory you cloned from git earlier and run the following comman
 SQL Client.
 ```
 xhost + && docker-compose exec query ./run.sh
+```
+
+# Java Decompiler
+You can search and browse the OIPA war file and decompiled code with the decompiler. Once you have setup
+your application you will be able to run the Java Decompiler in that environment. Navigate
+to the `oipa` directory you cloned from git earlier and run the following command to start the Decompiler.
+```
+xhost + && docker-compose exec jd ./run.sh
+```
+
+# Eclipse
+Once you have setup your application you will be able to run Eclipse in that environment. Navigate
+to the `oipa` directory you cloned from git earlier and run the following command to start Eclipse.
+```
+xhost + && docker-compose exec eclipse /home/developer/scripts/run.sh
+```
+
+## Build Extensions
+Work in progress...
+```
+docker-compose exec eclipse /home/developer/scripts/build.sh && \
+docker-compose restart oipa
 ```

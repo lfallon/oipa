@@ -20,6 +20,7 @@ COPY server.xml /config/
 RUN installUtility install --acceptLicense defaultServer
 
 # Install OIPA
+RUN pwd
 ARG OIPA_VERSION=10.2.0.30
 RUN curl --fail -o /config/apps/PASJava.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PASJava/${OIPA_VERSION}/PASJava-${OIPA_VERSION}.war
 
@@ -33,7 +34,7 @@ COPY palette/uploads/ /uploads/
 COPY shared/ /opt/ibm/wlp/usr/shared/
 
 # Extensions
-ENV DEBUGGER_VERSION=1.04.015
+ARG DEBUGGER_VERSION=1.04.021
 RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
 COPY extensions.xml /extensions/
