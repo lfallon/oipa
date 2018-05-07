@@ -26,7 +26,5 @@ else
   transform /uploads/EnvironmentConfig.noivs.xml.template > /uploads/EnvironmentConfig.xml
 fi
 
-# cat /uploads/EnvironmentConfig.xml
-
 # Start
 /opt/ibm/wlp/bin/server run defaultServer

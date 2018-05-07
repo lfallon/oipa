@@ -1,6 +1,48 @@
+FROM openjdk:8-jdk AS BOOTSTRAP
+
+# ----
+# Install Maven
+RUN apt-get install curl tar bash
+ARG MAVEN_VERSION=3.3.9
+ARG USER_HOME_DIR="/root"
+RUN mkdir -p /usr/share/maven && \
+curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar -xzC /usr/share/maven --strip-components=1 && \
+ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+ENV MAVEN_HOME /usr/share/maven
+ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+# Source And Target
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+ADD support/maven-settings.xml $MAVEN_CONFIG/settings.xml
+
+# Resolve Dependencies
+COPY support/bootstrap/pom.xml /usr/src/app/
+RUN mvn --fail-never -B dependency:resolve
+
+# Build And Install
+COPY support/bootstrap/ ./
+RUN mvn clean install
+
+# Target
+RUN mkdir -p /installs
+RUN cp dist/*deb /installs
+
+# =============================================================================================================================================
+
 FROM jboss/base-jdk:7
 
 ARG VERSION=20180426T152435Z-001
+
+# Alien
+USER root
+RUN yum -y install epel-release && yum clean all
+RUN rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+RUN rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+RUN yum -y update && yum -y install alien
+USER jboss
 
 ENV URL=http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/RulesPalette/${VERSION}/RulesPalette-${VERSION}.zip
 RUN echo Download: $URL
@@ -19,14 +61,24 @@ RUN rm -Rf ./etc/*
 COPY palette/etc/ /opt/jboss/RulesPalette/etc/
 RUN chmod 755 /opt/jboss/RulesPalette/bin/asgraphicruleside
 
+# Bootstrap
+RUN mkdir -p /opt/jboss/installs
+COPY --from=BOOTSTRAP /installs/ /opt/jboss/installs/
+USER root
+RUN cd /opt/jboss/installs && dpkg -i *.deb
+USER jboss
+
 # Run Script
 RUN mkdir -p /opt/jboss/scripts
 WORKDIR /opt/jboss/scripts
-RUN (echo "#!/bin/sh"; echo "(cd /opt/jboss/RulesPalette && bin/asgraphicruleside)") > run.sh
+COPY palette/run.sh run.sh
+USER root
 RUN chmod 755 run.sh
+USER jboss
+
+# RUN oipa-bootstrap
 
 ENTRYPOINT [ "/opt/jboss/scripts/run.sh" ]
-
 
 # Build
 # docker build -t local/palette -f Dockerfile.palette .
