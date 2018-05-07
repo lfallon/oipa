@@ -176,9 +176,9 @@ docker run --rm -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/
    export DB_NAME=OIPA_SandBox && docker-compose up
    ```
 
-   Run the following to build extensions locally:
+   Run with IVS using the following:
    ```
-   export DB_NAME=OIPA_SandBox && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+   export DB_NAME=OIPA_SandBox && export IVS=true && IVS_DB_NAME=OIPA_IVS && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
    ```
 
 # Palette

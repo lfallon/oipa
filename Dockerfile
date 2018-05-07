@@ -78,8 +78,13 @@ VOLUME /extensions
 RUN mkdir -p /installs
 COPY --from=BOOTSTRAP /installs/ /installs/
 RUN cd /installs && dpkg -i *.deb
+RUN mkdir -p /scripts
+COPY bootstrap.sh /scripts/
+RUN chmod 755 /scripts/bootstrap.sh
 
-CMD ["/opt/ibm/wlp/bin/server", "run", "defaultServer"]
+
+
+CMD ["/scripts/bootstrap.sh"]
 
 
 # Test
