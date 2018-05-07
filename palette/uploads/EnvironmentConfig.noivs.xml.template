@@ -7,25 +7,17 @@
 		<EncryptionType>01</EncryptionType>
 		<EncryptionIterationCount>1000</EncryptionIterationCount>
 		<DebuggerWebServiceUrl></DebuggerWebServiceUrl>
+		<DebuggerWebServiceUserName>LTJ49</DebuggerWebServiceUserName>
+		<DebuggerWebServicePassWord>10010382879117RUvi0ZlOZFXZW39JhjShijTU/JLfvEQOySFuYWeRl1iYqU17K69vSfuL4/acHs+jLuwXCP07HfMnvD7w2DS1fg==</DebuggerWebServicePassWord>
 		<PasDatabaseType>SQLServer</PasDatabaseType>
 		<PasDatabaseServer>db</PasDatabaseServer>
 		<PasDatabasePort>1433</PasDatabasePort>
 		<PasDatabaseName>OIPA_Sandbox</PasDatabaseName>
-		<PasDatabaseUrl>jdbc:jtds:sqlserver://db/OIPA_Sandbox;prepareSQL=2</PasDatabaseUrl>
+		<PasDatabaseUrl>jdbc:jtds:sqlserver://db:1433;DatabaseName=OIPA_Sandbox</PasDatabaseUrl>
 		<PasDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</PasDatabaseDriverClass>
 		<PasJNDILookup>No</PasJNDILookup>
-		<IvsDatabaseType>SQLServer</IvsDatabaseType>
-		<IvsDatabaseServer>db</IvsDatabaseServer>
-		<IvsDatabasePort>1433</IvsDatabasePort>
-		<IvsDatabaseName>OIPA_IVS</IvsDatabaseName>
-		<IvsEnv>sandbox</IvsEnv>
-		<IvsTrackNumber>1</IvsTrackNumber>
-		<IvsSequence>44</IvsSequence>
-		<IvsDatabaseUrl>jdbc:jtds:sqlserver://db/OIPA_IVS;prepareSQL=2</IvsDatabaseUrl>
-		<IvsDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</IvsDatabaseDriverClass>
-		<IvsJNDILookup>No</IvsJNDILookup>
-		<ReleaseManagement>on</ReleaseManagement>
-		<ReleaseManagementEntryEnv>true</ReleaseManagementEntryEnv>
+		<ReleaseManagement>off</ReleaseManagement>
+		<ReleaseManagementEntryEnv>false</ReleaseManagementEntryEnv>
 		<UseProducts>true</UseProducts>
 	</PaletteProperties>
 </root>

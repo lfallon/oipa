@@ -1,0 +1,31 @@
+<root>
+	<PaletteProperties>
+		<PaletteVersion>${PALETTE_VERSION}</PaletteVersion>
+		<NBU>${PALETTE_NBU}</NBU>
+		<PasEnvType>Development</PasEnvType>
+		<PasConfigCacheClear>off</PasConfigCacheClear>
+		<EncryptionType>01</EncryptionType>
+		<EncryptionIterationCount>1000</EncryptionIterationCount>
+		<DebuggerWebServiceUrl></DebuggerWebServiceUrl>
+		<PasDatabaseType>SQLServer</PasDatabaseType>
+		<PasDatabaseServer>db</PasDatabaseServer>
+		<PasDatabasePort>1433</PasDatabasePort>
+		<PasDatabaseName>${DB_NAME}</PasDatabaseName>
+		<PasDatabaseUrl>jdbc:jtds:sqlserver://db/${DB_NAME};prepareSQL=2</PasDatabaseUrl>
+		<PasDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</PasDatabaseDriverClass>
+		<PasJNDILookup>No</PasJNDILookup>
+		<IvsDatabaseType>SQLServer</IvsDatabaseType>
+		<IvsDatabaseServer>db</IvsDatabaseServer>
+		<IvsDatabasePort>1433</IvsDatabasePort>
+		<IvsDatabaseName>${IVS_DB_NAME}</IvsDatabaseName>
+		<IvsEnv>${IVS_ENV}</IvsEnv>
+		<IvsTrackNumber>${IVS_TRACK}</IvsTrackNumber>
+		<IvsSequence>44</IvsSequence>
+		<IvsDatabaseUrl>jdbc:jtds:sqlserver://db/${IVS_DB_NAME};prepareSQL=2</IvsDatabaseUrl>
+		<IvsDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</IvsDatabaseDriverClass>
+		<IvsJNDILookup>No</IvsJNDILookup>
+		<ReleaseManagement>${IVS_RELEASE_MANAGEMENT}</ReleaseManagement>
+		<ReleaseManagementEntryEnv>true</ReleaseManagementEntryEnv>
+		<UseProducts>${IVS_USE_PRODUCTS}</UseProducts>
+	</PaletteProperties>
+</root>
