@@ -4,14 +4,13 @@ import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.adminserver.asideutilities.globals.CipherUtl;
@@ -23,58 +22,6 @@ import com.pennassurancesoftware.oipa.bootstrap.util.TempFolder;
 
 public class CLI {
     public static abstract class Command {
-	public static class _Escape extends Command {
-	    @Parameters(commandDescription = "Escapes a text that can be used in a properties file", commandNames = "escape")
-	    public static class Args implements Command.Args {
-		@Parameter(description = "Text that should be escaped.", arity = 1, required = false)
-		public List<String> descriptors;
-
-		@Override
-		public <T> T accept(Visitor<T> visitor) {
-		    return visitor.visit(this);
-		}
-	    }
-
-	    private final String text;
-
-	    public _Escape(String text) {
-		this.text = text;
-	    }
-
-	    @Override
-	    public _Escape execute() {
-		System.out.println(Support.escaped(text));
-
-		return this;
-	    }
-	}
-
-	public static class _Unescape extends Command {
-	    @Parameters(commandDescription = "Unescapes a text that can be used in a properties file", commandNames = "unescape")
-	    public static class Args implements Command.Args {
-		@Parameter(description = "Text that should be unescaped.", arity = 1, required = false)
-		public List<String> descriptors;
-
-		@Override
-		public <T> T accept(Visitor<T> visitor) {
-		    return visitor.visit(this);
-		}
-	    }
-
-	    private final String text;
-
-	    public _Unescape(String text) {
-		this.text = text;
-	    }
-
-	    @Override
-	    public _Unescape execute() {
-		System.out.println(Support.unescaped(text));
-
-		return this;
-	    }
-	}
-
 	public static class _Decrypt extends Command {
 	    @Parameters(commandDescription = "Decrypts specified text to plain text.", commandNames = "decrypt")
 	    public static class Args implements Command.Args {
@@ -127,6 +74,58 @@ public class CLI {
 	    }
 	}
 
+	public static class _Escape extends Command {
+	    @Parameters(commandDescription = "Escapes a text that can be used in a properties file", commandNames = "escape")
+	    public static class Args implements Command.Args {
+		@Parameter(description = "Text that should be escaped.", arity = 1, required = false)
+		public List<String> descriptors;
+
+		@Override
+		public <T> T accept(Visitor<T> visitor) {
+		    return visitor.visit(this);
+		}
+	    }
+
+	    private final String text;
+
+	    public _Escape(String text) {
+		this.text = text;
+	    }
+
+	    @Override
+	    public _Escape execute() {
+		System.out.println(Support.escaped(text));
+
+		return this;
+	    }
+	}
+
+	public static class _Unescape extends Command {
+	    @Parameters(commandDescription = "Unescapes a text that can be used in a properties file", commandNames = "unescape")
+	    public static class Args implements Command.Args {
+		@Parameter(description = "Text that should be unescaped.", arity = 1, required = false)
+		public List<String> descriptors;
+
+		@Override
+		public <T> T accept(Visitor<T> visitor) {
+		    return visitor.visit(this);
+		}
+	    }
+
+	    private final String text;
+
+	    public _Unescape(String text) {
+		this.text = text;
+	    }
+
+	    @Override
+	    public _Unescape execute() {
+		System.out.println(Support.unescaped(text));
+
+		return this;
+	    }
+	}
+
 	public static interface Args {
 	    public static interface Visitor<T> {
 		public static class Default implements Visitor<Command> {
@@ -140,10 +139,8 @@ public class CLI {
 		    }
 
 		    private String first(List<String> descriptors) {
-			return Optional.ofNullable(descriptors)
-				.filter((d) -> d.size() >= 1)
-				.map((d) -> d.get(0))
-				.orElse("");
+			final List<String> array = ObjectUtils.defaultIfNull(descriptors, new ArrayList<String>());
+			return array.size() >= 1 ? array.get(0) : "";
 		    }
 
 		    @Override
@@ -157,11 +154,6 @@ public class CLI {
 		    }
 
 		    @Override
-		    public Command.Help visit(Command.Help.Args args) {
-			return new Command.Help(commander);
-		    }
-
-		    @Override
 		    public Command visit(Command._Escape.Args args) {
 			return new Command._Escape(first(args.descriptors));
 		    }
@@ -169,6 +161,11 @@ public class CLI {
 		    @Override
 		    public Command visit(Command._Unescape.Args args) {
 			return new Command._Unescape(first(args.descriptors));
+		    }
+
+		    @Override
+		    public Command.Help visit(Command.Help.Args args) {
+			return new Command.Help(commander);
 		    }
 		}
 
@@ -212,34 +209,6 @@ public class CLI {
     }
 
     public static abstract class Support {
-	public static Escaped escaped(String text) {
-	    return new Escaped(text);
-	}
-
-	public static Unescaped unescaped(String text) {
-	    return new Unescaped(text);
-	}
-
-	public static class Unescaped {
-	    private final String text;
-
-	    public Unescaped(String text) {
-		this.text = text;
-	    }
-
-	    @Override
-	    public String toString() {
-		try {
-		    final String raw = String.format("temp=%s", text);
-		    final Properties props = new Properties();
-		    props.load(new StringReader(raw));
-		    return props.getProperty("temp");
-		} catch (Throwable exception) {
-		    throw new RuntimeException(String.format("Failed to unescape string: %s", text), exception);
-		}
-	    }
-	}
-
 	public static class Escaped {
 	    private final String text;
 
@@ -267,13 +236,13 @@ public class CLI {
 
 	public static abstract class Logging {
 	    public static class ForConsole {
-		private final Optional<File> working;
+		private final File working;
 
 		public ForConsole() {
-		    this(Optional.<File>empty());
+		    this(null);
 		}
 
-		public ForConsole(Optional<File> working) {
+		public ForConsole(File working) {
 		    this.working = working;
 		}
 
@@ -290,11 +259,11 @@ public class CLI {
 		}
 
 		public ForConsole to(File working) {
-		    return new ForConsole(Optional.ofNullable(working));
+		    return new ForConsole(working);
 		}
 
 		private File working() {
-		    return working.orElseGet(() -> new TempFolder.Default().create());
+		    return ObjectUtils.defaultIfNull(working, new TempFolder.Default().create());
 		}
 	    }
 
@@ -313,6 +282,34 @@ public class CLI {
 	    public static Home home() {
 		return new Home();
 	    }
+	}
+
+	public static class Unescaped {
+	    private final String text;
+
+	    public Unescaped(String text) {
+		this.text = text;
+	    }
+
+	    @Override
+	    public String toString() {
+		try {
+		    final String raw = String.format("temp=%s", text);
+		    final Properties props = new Properties();
+		    props.load(new StringReader(raw));
+		    return props.getProperty("temp");
+		} catch (Throwable exception) {
+		    throw new RuntimeException(String.format("Failed to unescape string: %s", text), exception);
+		}
+	    }
+	}
+
+	public static Escaped escaped(String text) {
+	    return new Escaped(text);
+	}
+
+	public static Unescaped unescaped(String text) {
+	    return new Unescaped(text);
 	}
     }
 
@@ -357,14 +354,23 @@ public class CLI {
 	command().execute();
     }
 
+    private String fileName(Date date) {
+	return new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(date);
+    }
+
+    private File home() {
+	return new File(System.getProperty("user.home"));
+    }
+
     private void logging() {
 	Support.Logging.forConsole().to(working()).setup();
     }
 
+    private File program() {
+	return new File(home(), ".oipa-bootstrap-cli");
+    }
+
     private File working() {
-	final Supplier<File> home = () -> new File(System.getProperty("user.home"));
-	final Supplier<File> program = () -> new File(home.get(), ".oipa-bootstrap-cli");
-	final Function<Date, String> fileName = (date) -> new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(date);
-	return new File(program.get(), fileName.apply(created));
+	return new File(program(), fileName(created));
     }
 }
