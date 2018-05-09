@@ -150,7 +150,7 @@ public class CLI {
 
 		    @Override
 		    public String visit(Param.Prop param) {
-			return palette().config().props().getProperty(param.name());
+			return StringUtils.defaultIfEmpty(palette().config().props().getProperty(param.name()), "");
 		    }
 		};
 	    }
