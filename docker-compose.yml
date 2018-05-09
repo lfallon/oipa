@@ -29,8 +29,9 @@ services:
     environment:
       - DB_HOST=db
       - DB_NAME=${DB_NAME}
-      - DB_USER=sa
+      - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - IVS=${IVS}
       - IVS_DB_NAME=${IVS_DB_NAME}
 
   palette:
@@ -49,12 +50,12 @@ services:
     ports:
       - 1044:1044
     environment:
-      - DB_HOST=db
-      - DB_NAME=${DB_NAME}
-      - IVS_DB_NAME=${IVS_DB_NAME}
-      - DB_USER=sa
-      - DB_PASSWORD=${DB_PASSWORD}
       - DISPLAY=unix$DISPLAY
+      - PALETTE_URL=http://oipa:9080/PaletteConfig
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - IVS=${IVS}
+      - IVS_DB_NAME=${IVS_DB_NAME}
 
   query:
     build:

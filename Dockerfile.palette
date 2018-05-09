@@ -68,6 +68,16 @@ USER root
 RUN cd /opt/jboss/installs && dpkg -i *.deb
 USER jboss
 
+# Environment
+ENV PALETTE_URL=
+ENV DB_HOST=
+ENV DB_NAME=
+ENV DB_USER=
+ENV DB_PASSWORD=
+ENV PALETTE_URL=http://oipa:9080/PaletteConfig
+ENV IVS=
+ENV IVS_DB_NAME=
+
 # Run Script
 RUN mkdir -p /opt/jboss/scripts
 WORKDIR /opt/jboss/scripts
@@ -76,12 +86,10 @@ USER root
 RUN chmod 755 run.sh
 USER jboss
 
-# RUN oipa-bootstrap
-
 ENTRYPOINT [ "/opt/jboss/scripts/run.sh" ]
 
 # Build
 # docker build -t local/palette -f Dockerfile.palette .
 
 # Run
-# docker run -it --rm -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name palette local/palette
+# docker run -it --rm --network oipa_default -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY -e PALETTE_URL=http://oipa:9080/PaletteConfig -e DB_USER=sa -e DB_PASSWORD=SQLServerPass1 --device /dev/snd --name palette local/palette
