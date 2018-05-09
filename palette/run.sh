@@ -15,8 +15,11 @@ function transform() {
 # Delcare properties
 # Transform properties file
 
+declare RESOURCE_USER=install
+declare RESOURCE_PASSWORD=install
+
 function prop() {
-  oipa-bootstrap palette $PALETTE_URL -u install -p install --prop $1
+  oipa-bootstrap palette $PALETTE_URL -u ${RESOURCE_USER} -p ${RESOURCE_PASSWORD} --prop $1
 }
 
 declare DB_HOST=$(prop PasDatabaseServer)
@@ -25,12 +28,25 @@ declare PROP_JDBC_URL=$(oipa-bootstrap escape "jdbc:jtds:sqlserver://${DB_HOST}/
 declare PROP_JDBC_HOST=$(oipa-bootstrap escape "${DB_HOST}")
 declare PROP_JDBC_USER=$(oipa-bootstrap escape "${DB_USER}")
 declare PROP_JDBC_PASSWORD=$(oipa-bootstrap escape "$(oipa-bootstrap encrypt \"${DB_PASSWORD}\")")
-declare PROP_DB=$(oipa-bootstrap escape "${DB_NAME}")
+declare PROP_JDBC_DB=$(oipa-bootstrap escape "${DB_NAME}")
+declare PROP_RESOURCE_USER=$(oipa-bootstrap escape "${RESOURCE_USER}")
+declare PROP_RESOURCE_PASSWORD=$(oipa-bootstrap escape "$(oipa-bootstrap encrypt \"${RESOURCE_PASSWORD}\")")
+declare PROP_PALETTE_URL=$(oipa-bootstrap escape "${PALETTE_URL}")
 
+declare ENV_HOME=/opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/DOCKER
 
-echo $PROP_JDBC_URL
-echo $PROP_JDBC_USER
-echo $PROP_JDBC_PASSWORD
-echo $PROP_JDBC_HOST
+if [ -z "$(prop IvsDatabaseType | xargs)" ] ; then
+  transform ${ENV_HOME}/asenv.noivs.properties.template > ${ENV_HOME}/asenv.properties
+else
+  declare IVS_DB_HOST=$(prop IvsDatabaseServer)
+  declare IVS_DB_NAME=$(prop IvsDatabaseName)
+  declare PROP_JDBC_IVS_USER=${PROP_JDBC_USER}
+  declare PROP_JDBC_IVS_PASSWORD=${PROP_JDBC_PASSWORD}
+  declare PROP_JDBC_IVS_DB=$(oipa-bootstrap escape "${IVS_DB_NAME}")
+  declare PROP_JDBC_IVS_URL=$(oipa-bootstrap escape "jdbc:jtds:sqlserver://${IVS_DB_HOST}/${IVS_DB_NAME};prepareSQL=2")
+  transform ${ENV_HOME}/asenv.ivs.properties.template > ${ENV_HOME}/asenv.properties
+fi
 
-# (cd /opt/jboss/RulesPalette && bin/asgraphicruleside)
+# cat $ENV_HOME/asenv.properties
+
+(cd /opt/jboss/RulesPalette && bin/asgraphicruleside)
