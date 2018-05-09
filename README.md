@@ -134,13 +134,15 @@ docker run --rm -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/
 ```
 
 # Setup
-1. Install Docker => https://docs.docker.com/install/linux/docker-ce/ubuntu/
-    Uninstall old versions
+## Install Docker
+Install Docker => https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
+1. Uninstall old versions
     ```
     sudo apt-get remove docker docker-engine docker.io
     ```
-    Install Dependencies
+
+2. Install Dependencies
     ```
     sudo apt-get update && \
     sudo apt-get install \
@@ -149,37 +151,45 @@ docker run --rm -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/
       curl \
       software-properties-common
     ```
-    Install
+3. Install
     ```
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
     sudo apt-get update && \
     sudo apt-get install docker-ce
     ```
-2. Install Docker Compose => https://docs.docker.com/compose/install/
-    ```
-    sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && \
-    sudo chmod +x /usr/local/bin/docker-compose && \
-    docker-compose --version
-    ```
-3. Clone Git Repository
-   ```
-   mkdir -p ~/git && cd ~/git && git clone https://github.com/PennAssuranceSoftware/oipa.git && cd oipa
-   ```
-4. Download Database Backups into the `env/restore` folder
-   ```
-   mkdir -p env/restore
-   ```
-5. Start
-   Export the name of the database as the variable `DB_NAME` before starting.
-   ```
-   export DB_NAME=OIPA_SandBox && docker-compose up
-   ```
+## Install Docker Compose
+Install Docker Compose => https://docs.docker.com/compose/install/
+```
+sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && \
+sudo chmod +x /usr/local/bin/docker-compose && \
+docker-compose --version
+```
 
-   Run with IVS using the following:
-   ```
-   export DB_NAME=OIPA_SandBox && export IVS=true && IVS_DB_NAME=OIPA_IVS && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-   ```
+## Clone Git Repository
+```
+mkdir -p ~/git && cd ~/git && git clone https://github.com/PennAssuranceSoftware/oipa.git && cd oipa
+```
+
+## Download Database Backups into the `env/restore` folder
+```
+mkdir -p env/restore
+```
+Copy your application database backup and IVS backup if you have one.
+
+## Start
+
+### NO IVS
+Export the name of the database as the variable `DB_NAME` before starting.
+```
+export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose up
+```
+
+### IVS
+Export the name of the database as the variables `DB_NAME`, `IVS`, and `IVS_DB_NAME` before starting.
+```
+export DB_NAME=OIPA_SandBox && export IVS=true && IVS_DB_NAME=OIPA_IVS && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
 
 # Palette
 Once you have setup your application you will be able to run the Palette in that environment. Navigate
