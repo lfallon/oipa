@@ -1,8 +1,10 @@
 package com.pennassurancesoftware.oipa.bootstrap;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,11 +19,147 @@ import com.adminserver.asideutilities.globals.CipherUtl;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.jcabi.immutable.Array;
+import com.pennassurancesoftware.oipa.bootstrap.util.Soap;
+import com.pennassurancesoftware.oipa.bootstrap.util.Soap.Credentials;
+import com.pennassurancesoftware.oipa.bootstrap.util.Soap.Wsdl;
 import com.pennassurancesoftware.oipa.bootstrap.util.TempFolder;
+import com.pennassurancesoftware.oipa.bootstrap.util.Xml;
+import com.pennassurancesoftware.oipa.bootstrap.util.Xml.Support.W3C._Element;
 
 public class CLI {
     public static abstract class Command {
+	public static class _Palette extends Command {
+	    @Parameters(commandDescription = "Get Palette properties from Palette Configure web service.", commandNames = "palette")
+	    public static class Args implements Command.Args {
+		@Parameter(description = "URL of the Palette Config.", arity = 1, required = false)
+		public List<String> descriptors;
+
+		@Parameter(names = { "--user",
+			"-u" }, description = "User to log into the Palette Config service.", required = true)
+		public String user;
+
+		@Parameter(names = { "--password",
+			"-p" }, description = "Password to log into the Palette Config service.", required = true)
+		public String password;
+
+		@Parameter(names = {
+			"--props" }, description = "Show all properties from Palette Config service.", required = false)
+		public boolean propsFlag;
+
+		@Parameter(names = {
+			"--prop" }, description = "Show all properties from Palette Config service.", required = false)
+		public String propName;
+
+		@Override
+		public <T> T accept(Visitor<T> visitor) {
+		    return visitor.visit(this);
+		}
+	    }
+
+	    public static abstract class Param {
+		public static interface Visitor<T> {
+		    public T visit(Xml param);
+
+		    public T visit(Props param);
+
+		    public T visit(Prop param);
+		}
+
+		public static class Xml extends Param {
+
+		    @Override
+		    public <T> T accept(Visitor<T> visitor) {
+			return visitor.visit(this);
+		    }
+
+		}
+
+		public static class Props extends Param {
+		    @Override
+		    public <T> T accept(Visitor<T> visitor) {
+			return visitor.visit(this);
+		    }
+		}
+
+		public static class Prop extends Param {
+		    private final String name;
+
+		    public Prop(String name) {
+			this.name = name;
+		    }
+
+		    public String name() {
+			return name;
+		    }
+
+		    @Override
+		    public <T> T accept(Visitor<T> visitor) {
+			return visitor.visit(this);
+		    }
+		}
+
+		public abstract <T> T accept(Visitor<T> visitor);
+	    }
+
+	    private final String url;
+	    private final String user;
+	    private final String password;
+	    private final Param param;
+
+	    public _Palette(String url, String user, String password) {
+		this(url, user, password, new Param.Xml());
+	    }
+
+	    public _Palette(String url, String user, String password, Param param) {
+		this.url = url;
+		this.user = user;
+		this.password = password;
+		this.param = param;
+	    }
+
+	    private Support.Palette palette() {
+		return Support.palette(url, credentials());
+	    }
+
+	    @Override
+	    public _Palette execute() {
+		System.out.println(param.accept(visitor()));
+
+		return this;
+	    }
+
+	    private Param.Visitor<String> visitor() {
+		return new Param.Visitor<String>() {
+		    @Override
+		    public String visit(Param.Xml param) {
+			return palette().config().xml();
+		    }
+
+		    @Override
+		    public String visit(Param.Props param) {
+			final StringWriter result = new StringWriter();
+			final PrintWriter writer = new PrintWriter(result);
+			palette().config().props().list(writer);
+			writer.flush();
+			return result.toString();
+		    }
+
+		    @Override
+		    public String visit(Param.Prop param) {
+			return palette().config().props().getProperty(param.name());
+		    }
+		};
+	    }
+
+	    private Soap.Credentials credentials() {
+		return Soap.credentials(user, password);
+	    }
+	}
+
 	public static class _Decrypt extends Command {
 	    @Parameters(commandDescription = "Decrypts specified text to plain text.", commandNames = "decrypt")
 	    public static class Args implements Command.Args {
@@ -167,6 +305,21 @@ public class CLI {
 		    public Command.Help visit(Command.Help.Args args) {
 			return new Command.Help(commander);
 		    }
+
+		    @Override
+		    public Command visit(Command._Palette.Args args) {
+			return new Command._Palette(first(args.descriptors), args.user, args.password, param(args));
+		    }
+
+		    private Command._Palette.Param param(Command._Palette.Args args) {
+			Command._Palette.Param result = new Command._Palette.Param.Xml();
+			if (!StringUtils.isEmpty(args.propName)) {
+			    result = new Command._Palette.Param.Prop(args.propName);
+			} else if (args.propsFlag) {
+			    result = new Command._Palette.Param.Props();
+			}
+			return result;
+		    }
 		}
 
 		T visit(_Decrypt.Args args);
@@ -178,6 +331,8 @@ public class CLI {
 		T visit(_Unescape.Args args);
 
 		T visit(Help.Args args);
+
+		T visit(_Palette.Args args);
 	    }
 
 	    public <T> T accept(Visitor<T> visitor);
@@ -209,6 +364,126 @@ public class CLI {
     }
 
     public static abstract class Support {
+	public static class SafeUrl {
+	    private final String url;
+
+	    public SafeUrl(String url) {
+		this.url = url;
+	    }
+
+	    public URL url() {
+		try {
+		    return new URL(url);
+		} catch (Throwable exception) {
+		    throw new RuntimeException(String.format("Failed to parse URL: %s", url), exception);
+		}
+	    }
+	}
+
+	public static class Palette {
+	    private final URL url;
+	    private final Soap.Credentials credentials;
+
+	    public Palette(String url, Soap.Credentials credentials) {
+		this(new SafeUrl(url).url(), credentials);
+	    }
+
+	    public Palette(URL url, Soap.Credentials credentials) {
+		this.url = url;
+		this.credentials = credentials;
+	    }
+
+	    public Configuration config() {
+		return new Configuration.FromUrl(url, credentials);
+	    }
+
+	    public static abstract class Configuration {
+		public static class FromUrl extends Configuration {
+		    private final URL url;
+		    private final Soap.Credentials credentials;
+
+		    public FromUrl(URL url, Soap.Credentials credentials) {
+			this.url = url;
+			this.credentials = credentials;
+		    }
+
+		    private Soap.Default soap() {
+			return Soap.on(wsdl(), "getEnvironments").withCredentials(credentials());
+		    }
+
+		    private Credentials credentials() {
+			return Soap.credentials(credentials.user(),
+				CipherUtl.encrypt(credentials.password().toCharArray()));
+		    }
+
+		    private Wsdl wsdl() {
+			return Soap.wsdl(url());
+		    }
+
+		    private URL url() {
+			return new SafeUrl(String.format("%s/%s", url.toString(), "ConfigureService?wsdl")).url();
+		    }
+
+		    private FromXml from() {
+			return new FromXml(Xml.from(soap().call()));
+		    }
+
+		    @Override
+		    public String xml() {
+			return from().xml();
+		    }
+
+		    @Override
+		    public Properties props() {
+			return from().props();
+		    }
+		}
+
+		public static class FromXml extends Configuration {
+		    private final Xml xml;
+
+		    public FromXml(Xml xml) {
+			this.xml = xml;
+		    }
+
+		    @Override
+		    public String xml() {
+			return xml.toString();
+		    }
+
+		    private Optional<Xml.Support.W3C._Element> propertiesElement() {
+			return Iterables.tryFind(xml.root().elements(),
+				Xml.Support.W3C._Element.Filters.byName("PaletteProperties"));
+		    }
+
+		    @Override
+		    public Properties props() {
+			final Function<Xml.Support.W3C._Element, Properties> toProps = new Function<Xml.Support.W3C._Element, Properties>() {
+			    @Override
+			    public Properties apply(_Element element) {
+				final Properties result = new Properties();
+				for (Xml.Support.W3C._Element child : element.elements()) {
+				    result.setProperty(child.name(), child.text());
+				}
+				return result;
+			    }
+			};
+
+			return propertiesElement().transform(toProps).or(new Properties());
+		    }
+		}
+
+		public abstract String xml();
+
+		public abstract Properties props();
+
+		@Override
+		public String toString() {
+		    return xml();
+		}
+	    }
+	}
+
 	public static class Escaped {
 	    private final String text;
 
@@ -304,6 +579,14 @@ public class CLI {
 	    }
 	}
 
+	public static Palette palette(String url, Soap.Credentials credentials) {
+	    return new Palette(url, credentials);
+	}
+
+	public static Palette palette(URL url, Soap.Credentials credentials) {
+	    return new Palette(url, credentials);
+	}
+
 	public static Escaped escaped(String text) {
 	    return new Escaped(text);
 	}
@@ -345,6 +628,7 @@ public class CLI {
 	commander.addCommand(new Command._Decrypt.Args());
 	commander.addCommand(new Command._Escape.Args());
 	commander.addCommand(new Command._Unescape.Args());
+	commander.addCommand(new Command._Palette.Args());
 	commander.parse(args.toArray(new String[args.size()]));
 	return commander;
     }

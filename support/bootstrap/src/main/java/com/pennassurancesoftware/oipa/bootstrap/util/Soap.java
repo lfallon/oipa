@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -122,7 +121,29 @@ public abstract class Soap {
 	public String call() {
 	    log();
 
-	    return Optional.fromNullable(_invoke(envelope())).transform(Functions.toStringFunction()).orNull();
+	    final Function<Object, String> toString = new Function<Object, String>() {
+		private String str(SOAPEnvelope envelope) {
+		    try {
+			return deepest(envelope.getBody()).toString();
+		    } catch (Throwable exception) {
+			throw new RuntimeException(String.format("Failed to get body of SOAP Envelope: %s", envelope),
+				exception);
+		    }
+		}
+
+		private org.w3c.dom.Node deepest(org.w3c.dom.Node node) {
+		    return node.getFirstChild() != null ? deepest(node.getFirstChild()) : node;
+		}
+
+		@Override
+		public String apply(Object result) {
+		    return result instanceof SOAPEnvelope
+			    ? str((SOAPEnvelope) result)
+			    : result.toString();
+		}
+	    };
+
+	    return Optional.fromNullable(_invoke(envelope())).transform(toString).orNull();
 	}
 
 	private EngineConfiguration config() {

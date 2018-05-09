@@ -275,6 +275,11 @@ public abstract class Xml {
 		    public String pretty() {
 			return node().pretty();
 		    }
+
+		    @Override
+		    public String text() {
+			return element.getTextContent();
+		    }
 		}
 
 		public abstract Optional<String> att(String name);
@@ -282,6 +287,8 @@ public abstract class Xml {
 		public abstract String attOrErr(String name);
 
 		public abstract String name();
+		
+		public abstract String text();
 
 		public abstract Iterable<_Element> elements();
 
@@ -443,6 +450,7 @@ public abstract class Xml {
 	    }
 	}
 
+	@SuppressWarnings("unused")
 	private FromDom from() {
 	    return new FromDom(doc());
 	}
