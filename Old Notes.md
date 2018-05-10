@@ -21,7 +21,7 @@ make push
 
 # Run From MSSQL Backup File
 1. Copy your database backup into the `env/restore` folder
-2. Run Docker Compose to start the app `docker-compose build && export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && docker-compose up`
+2. Run Docker Compose to start the app `docker-compose build && export DB_NAME=$(docker-compose build db > /dev/null 2>&1 && docker-compose run -T --rm db print-restore-db) && docker-compose up`
 
 # Develop Debugger
 1. Copy your database backup into the `env/restore` folder
@@ -40,7 +40,7 @@ make push
 5. Run Docker Compose to start the app
     ```
     docker-compose pull
-    export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && \
+    export DB_NAME=$(docker-compose build db > /dev/null 2>&1 && docker-compose run -T --rm db print-restore-db) && \
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
     ```
 
@@ -52,7 +52,7 @@ mkdir -p env/extensions && \
 cp ${OIPA_TOOLS_HOME}/debugger-v10/dist/debugger-v10-*.jar env/extensions && \
 cp ${OIPA_TOOLS_HOME}/debugger-v10/src/main/config/extensions.xml env/extensions && \
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml rm -v -f && \
-export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && \
+export DB_NAME=$(docker-compose build db > /dev/null 2>&1 && docker-compose run -T --rm db print-restore-db) && \
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
@@ -69,7 +69,7 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
     ```
 4. Run Docker Compose to start the app
     ```
-    export DB_NAME=$(docker-compose run -T --rm db print-restore-db) && \
+    export DB_NAME=$(docker-compose build db > /dev/null 2>&1 && docker-compose run -T --rm db print-restore-db) && \
     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
     ```
 
