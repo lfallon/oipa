@@ -54,8 +54,9 @@ WORKDIR RulesPalette
 RUN rm -Rf ./PaletteEnvironments/RulesIDE/*
 RUN mkdir -p ./PaletteEnvironments/RulesIDE/configuration
 COPY palette/environments/configuration/ /opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/configuration/
-RUN mkdir -p ./PaletteEnvironments/RulesIDE/DOCKER
-COPY palette/environments/DOCKER/ /opt/jboss/RulesPalette/PaletteEnvironments/RulesIDE/DOCKER/
+RUN mkdir -p ./environment.templates/DOCKER
+COPY palette/environment.templates/DOCKER/ /opt/jboss/RulesPalette/environment.templates/DOCKER/
+
 
 RUN rm -Rf ./etc/*
 COPY palette/etc/ /opt/jboss/RulesPalette/etc/

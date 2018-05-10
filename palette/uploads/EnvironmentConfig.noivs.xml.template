@@ -1,6 +1,6 @@
 <root>
 	<PaletteProperties>
-		<PaletteVersion>10.2.0.0</PaletteVersion>
+		<PaletteVersion>${PALETTE_VERSION}</PaletteVersion>
 		<NBU>No</NBU>
 		<PasEnvType>Development</PasEnvType>
 		<PasConfigCacheClear>off</PasConfigCacheClear>
@@ -10,10 +10,10 @@
 		<DebuggerWebServiceUserName>LTJ49</DebuggerWebServiceUserName>
 		<DebuggerWebServicePassWord>10010382879117RUvi0ZlOZFXZW39JhjShijTU/JLfvEQOySFuYWeRl1iYqU17K69vSfuL4/acHs+jLuwXCP07HfMnvD7w2DS1fg==</DebuggerWebServicePassWord>
 		<PasDatabaseType>SQLServer</PasDatabaseType>
-		<PasDatabaseServer>db</PasDatabaseServer>
+		<PasDatabaseServer>${DB_HOST}</PasDatabaseServer>
 		<PasDatabasePort>1433</PasDatabasePort>
-		<PasDatabaseName>OIPA_Sandbox</PasDatabaseName>
-		<PasDatabaseUrl>jdbc:jtds:sqlserver://db:1433;DatabaseName=OIPA_Sandbox</PasDatabaseUrl>
+		<PasDatabaseName>${DB_NAME}</PasDatabaseName>
+		<PasDatabaseUrl>jdbc:jtds:sqlserver://${DB_HOST}:1433;DatabaseName=${DB_NAME}</PasDatabaseUrl>
 		<PasDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</PasDatabaseDriverClass>
 		<PasJNDILookup>No</PasJNDILookup>
 		<ReleaseManagement>off</ReleaseManagement>

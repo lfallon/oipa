@@ -11,7 +11,7 @@
 		<PasDatabaseServer>db</PasDatabaseServer>
 		<PasDatabasePort>1433</PasDatabasePort>
 		<PasDatabaseName>${DB_NAME}</PasDatabaseName>
-		<PasDatabaseUrl>jdbc:jtds:sqlserver://db/${DB_NAME};prepareSQL=2</PasDatabaseUrl>
+		<PasDatabaseUrl>jdbc:jtds:sqlserver://${DB_HOST}/${DB_NAME};prepareSQL=2</PasDatabaseUrl>
 		<PasDatabaseDriverClass>net.sourceforge.jtds.jdbc.Driver</PasDatabaseDriverClass>
 		<PasJNDILookup>No</PasJNDILookup>
 		<IvsDatabaseType>SQLServer</IvsDatabaseType>
