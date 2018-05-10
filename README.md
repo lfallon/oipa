@@ -47,13 +47,18 @@ Copy your application database backup and IVS backup if you have one.
 ### NO IVS
 Export the name of the database as the variable `DB_NAME` before starting.
 ```
-export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose up
+export IVS=false && \
+export DB_NAME=OIPA_SandBox && \
+  docker-compose up
 ```
 
 ### IVS
 Export the name of the database as the variables `DB_NAME`, `IVS`, and `IVS_DB_NAME` before starting.
 ```
-export DB_NAME=OIPA_SandBox && export IVS=true && IVS_DB_NAME=OIPA_IVS && docker-compose -f docker-compose.yml up
+export DB_NAME=OIPA_SandBox && \
+export IVS=true && \
+export IVS_DB_NAME=OIPA_IVS && \
+  docker-compose up
 ```
 
 # Palette
@@ -90,7 +95,8 @@ xhost + && docker-compose exec eclipse /home/developer/scripts/run.sh
 
 ### Start In Developer Mode
 ```
-export DB_NAME=OIPA_SandBox && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+export DB_NAME=OIPA_SandBox && \
+  docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 ### Rebuild Extensions
