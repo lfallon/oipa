@@ -52,6 +52,13 @@ export DB_NAME=OIPA_SandBox && \
   docker-compose up
 ```
 
+#### Developer Mode
+```
+export IVS=false && \
+export DB_NAME=OIPA_SandBox && \
+  docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
 ### IVS
 Export the name of the database as the variables `DB_NAME`, `IVS`, and `IVS_DB_NAME` before starting.
 ```
@@ -59,6 +66,14 @@ export DB_NAME=OIPA_SandBox && \
 export IVS=true && \
 export IVS_DB_NAME=OIPA_IVS && \
   docker-compose up
+```
+
+#### Developer Mode
+```
+export DB_NAME=OIPA_SandBox && \
+export IVS=true && \
+export IVS_DB_NAME=OIPA_IVS && \
+  docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
 # Palette

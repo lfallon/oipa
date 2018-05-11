@@ -18,6 +18,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - OIPA_VERSION=${OIPA_VERSION}
+        - PALETTE_VERSION=${PALETTE_VERSION}
+        - DEBUGGER_VERSION=${DEBUGGER_VERSION}
     links:
       - db
     volumes:
@@ -83,10 +87,10 @@ services:
       - oipa
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./env/eclipse/workspace:/home/developer/eclipse-workspace:Z
-      - ./env/eclipse/prefs:/home/developer/.eclipse:Z
-      - ./env/eclipse/m2:/home/developer/.m2:Z
-      - ./env/eclipse/git:/home/developer/git:Z
+      - ./env/eclipse/workspace:/home/developer/eclipse-workspace
+      - ./env/eclipse/prefs:/home/developer/.eclipse
+      - ./env/eclipse/m2:/home/developer/.m2
+      - ./env/eclipse/git:/home/developer/git
     devices:
       - "/dev/snd"
     environment:

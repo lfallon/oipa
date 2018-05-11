@@ -18,7 +18,7 @@ IMAGE_NAME=oipa
 
 
 # X upload artifacts
-# x update build.env
+# x update .env
 # X Validate environment variables are set
 # commit changes
 # create tag
@@ -31,21 +31,21 @@ IMAGE_NAME=oipa
 
 
 define version
-	source build.env; \
-	echo "$${VERSION}";
+	source .env; \
+	echo "$${OIPA_VERSION}";
 endef
 
 define tag
-	source build.env; \
+	source .env; \
 	classifier=$(1); \
-	echo "$(OWNER)/$(IMAGE_NAME):$${VERSION}-$${classifier}";
+	echo "$(OWNER)/$(IMAGE_NAME):$${OIPA_VERSION}-$${classifier}";
 endef
 
 build: build-support
 	docker build --build-arg OIPA_VERSION=$(shell $(call version)) -t $(shell $(call tag,sqlserver)) .
 
 push: login
-	@echo 'publish $(VERSION) to $(OWNER)'
+	@echo 'publish $(OIPA_VERSION) to $(OWNER)'
 	docker push $(shell $(call tag,sqlserver))
 
 login: guard-DOCKER_USER guard-DOCKER_PASS
@@ -69,8 +69,8 @@ guard-%:
 	fi
 
 temp: build-support
-	docker run -w /opt/working -v $(SOURCE_PATH):/opt/working ubuntu bash support/update-env.sh build.env VERSION $(shell docker run -v $(SOURCE_PATH)/staging:/src oipa/upload version)
-	docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github add build.env
+	docker run -w /opt/working -v $(SOURCE_PATH):/opt/working ubuntu bash support/update-env.sh .env OIPA_VERSION $(shell docker run -v $(SOURCE_PATH)/staging:/src oipa/upload version)
+	docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github add .env
 	docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github diff --quiet --exit-code --cached || docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github commit -m "Upgrading to version $(shell $(call version))"
 	docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github show-ref --tags --quiet --verify -- "refs/tags/$(shell $(call version))" && docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github tag -d $(shell $(call version))
 	docker run -v $(SOURCE_PATH):/workspace -e EMAIL=$(GIT_EMAIL) -e NAME="${GIT_NAME}" -e PASS=$(GIT_PASS) oipa/github tag $(shell $(call version))

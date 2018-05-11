@@ -55,11 +55,11 @@ RUN installUtility install --acceptLicense defaultServer
 
 # Install OIPA
 RUN pwd
-ARG OIPA_VERSION=10.2.0.30
+ARG OIPA_VERSION=
 RUN curl --fail -o /config/apps/PASJava.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PASJava/${OIPA_VERSION}/PASJava-${OIPA_VERSION}.war
 
 # Install Palette
-ARG PALETTE_VERSION=10.1.2.1
+ARG PALETTE_VERSION=
 RUN curl --fail -o /config/apps/PaletteConfig.war -O http://repo.pennassurancesoftware.com/artifactory/public/com/adminserver/PaletteConfig/${PALETTE_VERSION}/PaletteConfig-${PALETTE_VERSION}.war
 RUN mkdir -p /uploads
 COPY palette/uploads/ /uploads/
@@ -68,7 +68,7 @@ COPY palette/uploads/ /uploads/
 COPY shared/ /opt/ibm/wlp/usr/shared/
 
 # Extensions
-ARG DEBUGGER_VERSION=1.04.021
+ARG DEBUGGER_VERSION=
 RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
 COPY extensions.xml /extensions/

@@ -10,7 +10,7 @@ docker run -d --name oipa -p 9080:9080 \
 
 # Build And Push
 
-Update the `build.env` file to be the version of OIPA to build and push for. Run the following commands in the console:
+Update the `.env` file to be the version of OIPA to build and push for. Run the following commands in the console:
 
 ```shell
 export DOCKER_USER=jeromebridge;
@@ -94,7 +94,7 @@ docker logs -f oipa
     ```
     export GIT_EMAIL=jeromebridge@gmail.com && export GIT_PASS=XXX && export GIT_NAME="Jerome Bridge" && make upgrade
     ```
-3. Update the `build.env` to the version of the `war` you just uploaded.
+3. Update the `.env` to the version of the `war` you just uploaded.
     ```
     export DOCKER_USER=jeromebridge && export DOCKER_PASS=XXX && make build push
     ```
@@ -102,7 +102,7 @@ docker logs -f oipa
 # Notes
 
 1. Upload war and artifacts to repo
-2. Update build.env
+2. Update .env
 3. commit and tag code
 3.   a. create github release
 4. push code

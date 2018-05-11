@@ -17,7 +17,7 @@ RUN chmod 755 run.sh
 
 ENV OIPA_TOOLS_SOURCE=${HOME}/git/oipa-tools
 ENV DEBUGGER_SOURCE=${OIPA_TOOLS_SOURCE}/debugger-v10
-RUN (echo "#!/bin/sh"; echo "(cd ${DEBUGGER_SOURCE} && mvn clean install && cp ${DEBUGGER_SOURCE}/dist/debugger-v10-*.jar ${HOME}/extensions && cp ${DEBUGGER_SOURCE}/src/main/config/extensions.xml ${HOME}/extensions)") > build.sh
+RUN (echo "#!/bin/sh"; echo "(cd ${DEBUGGER_SOURCE} && mvn clean install && cp ${DEBUGGER_SOURCE}/dist/debugger-v10-*.jar ${HOME}/extensions && cp ${DEBUGGER_SOURCE}/src/main/config/extensions.xml ${HOME}/extensions && ls -lah ${HOME}/extensions)") > build.sh
 RUN chmod 755 build.sh
 
 USER $USER_NAME
