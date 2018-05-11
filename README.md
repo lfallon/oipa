@@ -88,7 +88,7 @@ xhost + && docker-compose exec jd ./run.sh
 Once you have setup your application you will be able to run Eclipse in that environment. Navigate
 to the `oipa` directory you cloned from git earlier and run the following command to start Eclipse.
 ```
-xhost + && docker-compose exec eclipse /home/developer/scripts/run.sh
+xhost + && docker-compose exec eclipse ./run.sh
 ```
 
 ## Build Extensions
@@ -101,6 +101,5 @@ export DB_NAME=OIPA_SandBox && \
 
 ### Rebuild Extensions
 ```
-docker-compose exec eclipse /home/developer/scripts/build.sh && \
-docker-compose restart oipa
+docker-compose exec eclipse ./build.sh && docker-compose restart oipa
 ```

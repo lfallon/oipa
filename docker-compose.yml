@@ -83,10 +83,10 @@ services:
       - oipa
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ./env/eclipse/workspace:/home/developer/eclipse-workspace
-      - ./env/eclipse/prefs:/home/developer/.eclipse
-      - ./env/eclipse/m2:/home/developer/.m2
-      - ./env/eclipse/git:/home/developer/git
+      - ./env/eclipse/workspace:/home/developer/eclipse-workspace:Z
+      - ./env/eclipse/prefs:/home/developer/.eclipse:Z
+      - ./env/eclipse/m2:/home/developer/.m2:Z
+      - ./env/eclipse/git:/home/developer/git:Z
     devices:
       - "/dev/snd"
     environment:
