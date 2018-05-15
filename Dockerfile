@@ -64,15 +64,16 @@ RUN curl --fail -o /config/apps/PaletteConfig.war -O http://repo.pennassuranceso
 RUN mkdir -p /uploads
 COPY palette/uploads/ /uploads/
 
-# Config
-COPY shared/ /opt/ibm/wlp/usr/shared/
-
 # Extensions
 ARG DEBUGGER_VERSION=
 RUN mkdir -p /extensions
 RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://repo.pennassurancesoftware.com/artifactory/public/com/pennassurancesoftware/debugger-v10/${DEBUGGER_VERSION}/debugger-v10-${DEBUGGER_VERSION}.jar
 COPY extensions.xml /extensions/
 VOLUME /extensions
+
+# Config
+COPY shared/ /opt/ibm/wlp/usr/shared/
+COPY jvm.options /config/
 
 # Bootstrap
 RUN mkdir -p /installs
