@@ -34,24 +34,14 @@ RUN cp dist/*deb /installs
 
 FROM websphere-liberty:kernel
 
+# Setup WebSphere
 RUN apt-get update && apt-get install -y curl
-
-ENV JVM_ARGS="-Dwas.debug.mode=true -Dcom.ibm.websphere.ras.inject.at.transform=true -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"
-EXPOSE 7777
-
-RUN mkdir -p /logs
-VOLUME /logs
-ENV LOG_DIR=/logs
-
-ENV DB_HOST=104.208.247.218
-ENV DB_NAME=OIPA_GA
-ENV DB_USER=sqlUser
-ENV DB_PASSWORD=sqlUser1
-ENV DB_PORT=1433
-ENV IVS_DB_NAME=OIPA_IVS
-
 COPY server.xml /config/
 RUN installUtility install --acceptLicense defaultServer
+
+# Logs
+RUN mkdir -p /logs
+VOLUME /logs
 
 # Install OIPA
 RUN pwd
@@ -71,10 +61,6 @@ RUN curl --fail -o /extensions/debugger-v10-${DEBUGGER_VERSION}.jar -O http://re
 COPY extensions.xml /extensions/
 VOLUME /extensions
 
-# Config
-COPY shared/ /opt/ibm/wlp/usr/shared/
-COPY jvm.options /config/
-
 # Bootstrap
 RUN mkdir -p /installs
 COPY --from=BOOTSTRAP /installs/ /installs/
@@ -83,13 +69,27 @@ RUN mkdir -p /scripts
 COPY bootstrap.sh /scripts/
 RUN chmod 755 /scripts/bootstrap.sh
 
+# Config
+COPY shared/ /opt/ibm/wlp/usr/shared/
 
+# Environment Variables
+ENV LOG_DIR=/logs
+ENV JVM_ARGS="-Xms512m -Xmx1024m -Dwas.debug.mode=true -Dcom.ibm.websphere.ras.inject.at.transform=true -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"
+ENV DB_HOST=104.208.247.218
+ENV DB_NAME=OIPA_GA
+ENV DB_USER=sqlUser
+ENV DB_PASSWORD=sqlUser1
+ENV DB_PORT=1433
+ENV IVS_DB_NAME=OIPA_IVS
+
+
+EXPOSE 7777
 
 CMD ["/scripts/bootstrap.sh"]
 
 
 # Test
-# docker build -t local/oipa .
+# BUILD_ARGS=$(cat .env | grep -v ^# | grep -v -e '^[[:space:]]*$' | awk '$0="--build-arg "$0' | xargs) && docker build $BUILD_ARGS -t local/oipa .
 # docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 local/oipa; docker logs -f oipa
 # docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /tmp/logs:/logs -e DB_NAME=OIPA_POC local/oipa; docker logs -f oipa
 # docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /home/vagrant/git/oipa-tools/debugger-v10/dist:/extensions -e DB_NAME=OIPA_Securian local/oipa; docker logs -f oipa

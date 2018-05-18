@@ -132,3 +132,15 @@ Using more secure way to display on client (not working):
 ```
 docker run --rm -ti -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth dyokomizo/squirrel
 ```
+
+
+## Set Environment Variables From Environment File
+Setting:
+```
+export $(cat .env | grep -v ^# | xargs)
+```
+
+Unsetting:
+```
+unset $(cat .env | grep -v ^# | sed -E 's/(.*)=.*/\1/' | xargs) 
+```
