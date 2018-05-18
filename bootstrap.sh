@@ -26,5 +26,12 @@ else
   transform /uploads/EnvironmentConfig.noivs.xml.template > /uploads/EnvironmentConfig.xml
 fi
 
+EXTENSIONS_UPDATED_FILE=/extensions/updated.txt
+EXTENSIONS_UPDATED="Unknown"
+if [ -f $EXTENSIONS_UPDATED_FILE ]; then
+   EXTENSIONS_UPDATED=$(cat $EXTENSIONS_UPDATED_FILE)
+fi
+echo Extensions Updated: $EXTENSIONS_UPDATED
+
 # Start
 /opt/ibm/wlp/bin/server run defaultServer
