@@ -114,3 +114,16 @@ xhost + && docker-compose exec eclipse ./run.sh
 ```
 docker-compose exec eclipse ./build.sh && docker-compose restart oipa
 ```
+
+
+# Azure
+You can also run using databases hosted on Azure if you don't have your own database backup.
+Use the following command to start up the application pointing to an external database:
+```
+export IVS=false && \
+export DB_HOST=104.208.247.218 && \
+export DB_NAME=OIPA_Securian && \
+export DB_USER=sqlUser && \
+export DB_PASSWORD=sqlUser1 && \
+  docker-compose up
+```
