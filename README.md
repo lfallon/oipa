@@ -127,3 +127,13 @@ export DB_USER=sqlUser && \
 export DB_PASSWORD=sqlUser1 && \
   docker-compose up
 ```
+
+
+# Docker Commands
+## Clear Everything
+```
+docker stop $(docker ps -a -q)
+docker ps -a | grep -i -E "Exit|Create" | grep -v ^CONTAINER | cut -d ' ' -f 1 | xargs sudo docker rm
+docker rmi -f $(docker images -q)
+docker volume rm $(docker volume ls -f dangling=true -q)
+```
