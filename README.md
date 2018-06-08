@@ -166,3 +166,14 @@ can be made.
     export myIP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') && \
     xhost + && docker-compose exec -e DISPLAY=$myIP:0 query ./run.sh
     ```
+
+# Upload New War
+1. Download `war` file to `env/upload` folder.
+2. Upload to Maven Repository.
+    ```
+    export GIT_EMAIL=jeromebridge@gmail.com && export GIT_PASS=XXX && export GIT_NAME="Jerome Bridge" && make upgrade
+    ```
+3. Update the `.env` to the version of the `war` you just uploaded.
+    ```
+    export DOCKER_USER=jeromebridge && export DOCKER_PASS=XXX && make build push
+    ```

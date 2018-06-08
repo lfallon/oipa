@@ -41,8 +41,12 @@ define tag
 	echo "$(OWNER)/$(IMAGE_NAME):$${OIPA_VERSION}-$${classifier}";
 endef
 
+define args
+	cat .env | grep -v ^# | grep -v -e '^[[:space:]]*$$' | awk '$$0="--build-arg "$$0' | xargs;
+endef
+
 build: build-support
-	docker build --build-arg OIPA_VERSION=$(shell $(call version)) -t $(shell $(call tag,sqlserver)) .
+	docker build $(shell $(call args)) -t $(shell $(call tag,sqlserver)) .
 
 push: login
 	@echo 'publish $(OIPA_VERSION) to $(OWNER)'
