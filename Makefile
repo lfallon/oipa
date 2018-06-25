@@ -63,7 +63,7 @@ build-support:
 
 upgrade: build-support upload
 
-upload: build-support guard-GIT_EMAIL guard-GIT_NAME guard-GIT_PASS
+upload: build-support
 	docker run -v $(SOURCE_PATH)/env/upload:/src oipa/upload upload
 
 guard-%:
