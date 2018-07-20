@@ -109,5 +109,14 @@ services:
     environment:
       - DISPLAY=unix$DISPLAY
 
+  files:
+    build:
+      context: .
+      dockerfile: Dockerfile.files
+    volumes:
+      - ./env/eclipse/git:/srv/git
+    ports:
+      - 9081:80
+
 volumes:
   db-data:
