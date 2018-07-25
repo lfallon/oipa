@@ -1,26 +1,38 @@
 FROM openkbs/eclipse-oxygen-docker
 
-RUN mkdir -p ${HOME}/.m2
-RUN mkdir -p ${HOME}/git
-RUN mkdir -p ${HOME}/extensions
-VOLUME ${HOME}/.m2
-VOLUME ${HOME}/git
-VOLUME ${HOME}/extensions
-
 USER root
 
 RUN apt-get update && apt-get install lib32ncurses5 lib32z1 -y
 
-# Run Script
+# Scripts
 RUN mkdir -p /scripts
 WORKDIR /scripts
-RUN (echo "#!/bin/sh"; echo "sudo chown -R $USER_NAME:$USER_NAME ${HOME}/.eclipse"; echo "sudo chown -R $USER_NAME:$USER_NAME ${ECLIPSE_WORKSPACE}"; echo "sudo chown -R $USER_NAME:$USER_NAME ${HOME}/git"; echo "sudo chown -R $USER_NAME:$USER_NAME ${HOME}/.m2"; echo "sudo chown -R $USER_NAME:$USER_NAME ${HOME}/extensions"; echo "/opt/eclipse/eclipse") > run.sh
+
+# Run Script
+COPY eclipse/run.sh .
 RUN chmod 755 run.sh
 
+# Build Script
+COPY eclipse/build.sh .
+RUN chmod 755 build.sh
+
+# Profile Script
+COPY eclipse/profile.sh .
+RUN chmod 755 profile.sh
+
+# Volumes
+RUN mkdir -p ${HOME}/.m2
+RUN mkdir -p ${HOME}/git
+RUN mkdir -p ${HOME}/extensions
+RUN mkdir -p ${HOME}/scratch
+VOLUME ${HOME}/.m2
+VOLUME ${HOME}/git
+VOLUME ${HOME}/extensions
+VOLUME ${HOME}/scratch
+
+# Environment Variables
 ENV OIPA_TOOLS_SOURCE=${HOME}/git/oipa-tools
 ENV DEBUGGER_SOURCE=${OIPA_TOOLS_SOURCE}/debugger-v10
-RUN (echo "#!/bin/sh"; echo "(cd ${DEBUGGER_SOURCE} && mvn clean install && cp ${DEBUGGER_SOURCE}/dist/debugger-v10-*.jar ${HOME}/extensions && cp ${DEBUGGER_SOURCE}/src/main/config/extensions.xml ${HOME}/extensions && date -d \"today\" +\"%Y.%m.%d_%r\" > ${HOME}/extensions/updated.txt)") > build.sh
-RUN chmod 755 build.sh
 
 USER $USER_NAME
 

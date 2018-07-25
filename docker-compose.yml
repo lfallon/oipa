@@ -71,6 +71,7 @@ services:
       - db
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./env/scratch:/scratch
     devices:
       - "/dev/snd"
     environment:
@@ -91,6 +92,7 @@ services:
       - ./env/eclipse/prefs:/home/developer/.eclipse
       - ./env/eclipse/m2:/home/developer/.m2
       - ./env/eclipse/git:/home/developer/git
+      - ./env/scratch:/home/developer/scratch
     devices:
       - "/dev/snd"
     environment:
@@ -104,6 +106,7 @@ services:
     tty: true
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./env/scratch:/scratch
     devices:
       - "/dev/snd"
     environment:
@@ -115,6 +118,7 @@ services:
       dockerfile: Dockerfile.files
     volumes:
       - ./env/eclipse/git:/srv/git
+      - ./env/scratch:/srv/scratch
     ports:
       - 9081:80
 

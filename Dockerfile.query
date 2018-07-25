@@ -1,6 +1,6 @@
 FROM dyokomizo/squirrel
 
-RUN apt-get update && apt-get install maven -y
+RUN apt-get update && apt-get install maven rpl -y
 
 ARG SQUIRREL_HOME=/opt/squirrel-sql-3.7
 
@@ -30,6 +30,8 @@ RUN mkdir -p /root/.squirrel-sql
 COPY squirrel/ /root/.squirrel-sql/
 
 # Run Script
+# RUN rpl -i -w "-Xmx256m" "-Xmx1024m" /opt/squirrel-sql-3.7/squirrel-sql.sh
+RUN sed -i 's/Xmx256m/Xmx1024m/g' /opt/squirrel-sql-3.7/squirrel-sql.sh
 RUN mkdir -p /scripts
 WORKDIR /scripts
 RUN (echo "#!/bin/sh"; echo "/opt/squirrel-sql-3.7/squirrel-sql.sh") > run.sh
