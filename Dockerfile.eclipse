@@ -25,10 +25,12 @@ RUN mkdir -p ${HOME}/.m2
 RUN mkdir -p ${HOME}/git
 RUN mkdir -p ${HOME}/extensions
 RUN mkdir -p ${HOME}/scratch
+RUN touch ${HOME}/.gitconfig
 VOLUME ${HOME}/.m2
 VOLUME ${HOME}/git
 VOLUME ${HOME}/extensions
 VOLUME ${HOME}/scratch
+VOLUME ${HOME}/.gitconfig
 
 # Environment Variables
 ENV OIPA_TOOLS_SOURCE=${HOME}/git/oipa-tools
