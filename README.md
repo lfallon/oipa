@@ -133,7 +133,7 @@ export DB_PASSWORD=sqlUser1 && \
 ## Clear Everything
 ```
 docker stop $(docker ps -a -q)
-docker ps -a | grep -i -E "Exit|Create" | grep -v ^CONTAINER | cut -d ' ' -f 1 | xargs sudo docker rm
+docker ps -a | grep -i -E "Exit|Create" | grep -v ^CONTAINER | cut -d ' ' -f 1 | xargs docker rm
 docker rmi -f $(docker images -q)
 docker volume rm $(docker volume ls -f dangling=true -q)
 ```

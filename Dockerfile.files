@@ -1,4 +1,4 @@
-FROM hacdias/filemanager
+FROM filebrowser/filebrowser
 
 
 EXPOSE 80
