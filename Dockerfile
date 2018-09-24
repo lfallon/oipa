@@ -72,6 +72,10 @@ RUN chmod 755 /scripts/bootstrap.sh
 # Config
 COPY shared/ /opt/ibm/wlp/usr/shared/
 
+# Override Config
+RUN mkdir -p /overrides
+VOLUME /overrides
+
 # Environment Variables
 ENV LOG_DIR=/logs
 ENV JVM_ARGS="-Xms512m -Xmx1024m -Dwas.debug.mode=true -Dcom.ibm.websphere.ras.inject.at.transform=true -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"

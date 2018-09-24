@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Palette
 function transform() {
   while read -r line ; do
     line=${line//\"/\\\"}
@@ -32,6 +33,12 @@ if [ -f $EXTENSIONS_UPDATED_FILE ]; then
    EXTENSIONS_UPDATED=$(cat $EXTENSIONS_UPDATED_FILE)
 fi
 echo Extensions Updated: $EXTENSIONS_UPDATED
+
+# Override
+if [ -f /overrides/PAS.properties ]; then
+    echo "PAS.properties Override Found!"
+    cp -Rf /overrides/PAS.properties /opt/ibm/wlp/usr/shared/resources/conf/PAS.properties
+fi
 
 # Start
 /opt/ibm/wlp/bin/server run defaultServer
