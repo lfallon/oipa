@@ -31,6 +31,15 @@ sudo chmod +x /usr/local/bin/docker-compose && \
 docker-compose --version
 ```
 
+## Permissions
+1. Add current user to the `docker` group.
+    ```
+    sudo usermod -aG docker $USER
+    ```
+2. Restart computer.
+
+
+
 ## Clone Git Repository
 ```
 mkdir -p ~/git && cd ~/git && git clone https://github.com/PennAssuranceSoftware/oipa.git && cd oipa

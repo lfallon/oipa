@@ -32,7 +32,7 @@ RUN cp dist/*deb /installs
 
 # =============================================================================================================================================
 
-FROM websphere-liberty:kernel
+FROM websphere-liberty:8.5.5.9-kernel
 
 # Setup WebSphere
 RUN apt-get update && apt-get install -y curl
