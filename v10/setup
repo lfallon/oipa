@@ -1,0 +1,71 @@
+#!/bin/bash
+
+echo "=============================================="
+echo "Configure SSH"
+echo "=============================================="
+
+config() {
+  local host=$1
+  local user=$2
+  cat <<EOF
+Host $host
+     Hostname $host
+     Port 22
+     user $user
+     ForwardX11 yes
+     ForwardX11Trusted yes
+EOF
+}
+
+server() {
+  local user=$1
+  rm /home/$user/.ssh/authorized_keys
+  cat /home/$user/.ssh/id_rsa.pub >> /home/$user/.ssh/authorized_keys
+}
+
+client() {
+  local user=$1
+  rm /home/$user/.ssh/config
+  rm /home/$user/.ssh/known_hosts
+  touch /home/$user/.ssh/known_hosts
+  config x11 root >> /home/$user/.ssh/config
+  chown $user /home/$user/.ssh/config
+  chown $user /home/$user/.ssh/known_hosts
+}
+
+generate() {
+  local user=$1
+  local file=/home/$user/.ssh/id_rsa
+  ssh-keygen -t rsa -b 4096 -C "dev@pennassurancesoftware.com" -N "" -f ${file} >/dev/null
+  RET=$?
+  if [ $RET -ne 0 ];then
+      echo ssh-keygen failed: $RET
+      exit 1
+  fi
+  chown $user ${file}*
+  chmod 400 ${file}*
+}
+
+configure() {
+   local user=$1
+   generate $user
+   server $user
+   client $user
+}
+
+# touch ~/.ssh/config
+# ls -lah ~/.ssh/config
+
+configure ubuntu   # Configures the ubuntu user
+
+# Grand Permissions
+# Generate Key
+# Authorized Keys
+# Ssh Client config
+
+echo ""
+echo "----------------------------------------------"
+echo "Configure Finished"
+echo "----------------------------------------------"
+
+supervisord
