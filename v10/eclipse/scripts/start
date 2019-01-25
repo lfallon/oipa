@@ -1,0 +1,32 @@
+#!/bin/bash
+
+copy_env() {
+  # rm -Rf /home/${USER_NAME}/.profile
+  # mkdir -p /home/${USER_NAME}/.ssh
+  # rm -Rf /home/${USER_NAME}/.ssh/environment
+  touch /etc/profile.d/env_vars.sh
+  rm /etc/profile.d/env_vars.sh
+  touch /home/${USER_NAME}/.pam_environment
+  rm /home/${USER_NAME}/.pam_environment
+  for VAR in "$@"
+  do
+      echo "export ${VAR}=$(printenv ${VAR})" >> /etc/profile.d/env_vars.sh
+      echo "${VAR}=$(printenv ${VAR})" >> /home/${USER_NAME}/.pam_environment
+      # echo "export ${VAR}=$(printenv ${VAR})" >> /home/${USER_NAME}/.profile
+      # echo "export ${VAR}=$(printenv ${VAR})" >> /home/${USER_NAME}/.ssh/environment
+  done
+  chown ${USER_NAME} /home/${USER_NAME}/.pam_environment
+}
+
+# Copy Environment Variables
+copy_env DEBIAN_FRONTEND ECLIPSE_VERSION ECLIPSE_WORKSPACE GRADLE_HOME HOSTNAME INSTALL_DIR JAVA_HOME MAVEN_HOME MAVEN_VERSION PATH USER_NAME
+
+# Setup SSH
+mkdir -p /home/${USER_NAME}/.ssh
+cp /home/${USER_NAME}/ssh/authorized_keys /home/${USER_NAME}/.ssh
+chown -R ${USER_NAME} /home/${USER_NAME}/.ssh
+chmod 755 /home/${USER_NAME}/.ssh
+chmod 600 /home/${USER_NAME}/.ssh/authorized_keys
+
+# SSH
+/usr/sbin/sshd && tail -f /dev/null

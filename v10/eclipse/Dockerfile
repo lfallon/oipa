@@ -1,8 +1,35 @@
-FROM openkbs/eclipse-oxygen-docker
+FROM jeromebridge/eclipse-oxygen-docker
 
 USER root
 
+# Install Dependencies
 RUN apt-get update && apt-get install lib32ncurses5 lib32z1 -y
+RUN apt-get update && apt-get install libwebkitgtk-3.0-0 -y
+RUN apt-get update && apt-get install dbus-x11 -y
+RUN apt-get update && apt-get install nano
+RUN apt-get update && apt-get install -y openssh-server xauth
+
+# Configure SSH
+RUN mkdir /var/run/sshd \
+    && sed -i "s/^.*PasswordAuthentication.*$/PasswordAuthentication no/" /etc/ssh/sshd_config \
+    && sed -i "s/^.*X11Forwarding.*$/X11Forwarding yes/" /etc/ssh/sshd_config \
+    && sed -i "s/^.*X11UseLocalhost.*$/X11UseLocalhost no/" /etc/ssh/sshd_config \
+    && grep "^X11UseLocalhost" /etc/ssh/sshd_config || echo "X11UseLocalhost no" >> /etc/ssh/sshd_config \
+    && grep "^PermitUserEnvironment" /etc/ssh/sshd_config || echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+
+RUN mkdir /root/.ssh \
+  && chmod 700 /root/.ssh \
+  && ssh-keygen -A
+
+# Eclipse Settings
+RUN sed -i -e 's/Xmx1024m/Xmx10536m/g' /opt/eclipse/eclipse.ini
+
+# Eclipse: Disable JPA Feature
+RUN ( cd /opt/eclipse && \
+  mkdir -p disabled/features && \
+  mkdir -p disabled/plugins && \
+  mv plugins/org.eclipse.jpt.* disabled/plugins && \
+  mv features/org.eclipse.jpt.* disabled/features )
 
 # Scripts
 RUN mkdir -p /tmp/scripts
@@ -10,21 +37,14 @@ COPY scripts/ /tmp/scripts/
 RUN chmod +x /tmp/scripts/* && mv /tmp/scripts/* /usr/local/bin/
 
 # Volumes
+USER ${USER_NAME}
 RUN mkdir -p ${HOME}/.m2
 RUN mkdir -p ${HOME}/git
 RUN mkdir -p ${HOME}/scratch
+RUN mkdir -p ${HOME}/ssh
 VOLUME ${HOME}/.m2
 VOLUME ${HOME}/git
 VOLUME ${HOME}/scratch
+USER root
 
-# User
-USER $USER_NAME
-
-CMD ["run"]
-
-
-# docker build -t local/eclipse -f Dockerfile.eclipse .
-# docker run -it --rm -v $(pwd)/env/eclipse/workspace:/home/developer/eclipse-workspace -v $(pwd)/env/eclipse/prefs:/home/developer/.eclipse -v $(pwd)/env/eclipse/m2:/home/developer/.m2 -v $(pwd)/env/eclipse/git:/home/developer/git -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name eclipse local/eclipse
-
-
-# mkdir -p /tmp/ws && chmod 777 /tmp/ws && mkdir -p /tmp/.eclipse && chmod 777 /tmp/.eclipse && docker run -it --rm -v /tmp/ws:/home/developer/eclipse-workspace -v /tmp/.eclipse:/home/developer/.eclipse -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name eclipse openkbs/eclipse-oxygen-docker
+ENTRYPOINT ["start"]

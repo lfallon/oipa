@@ -5,23 +5,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint: /bin/bash
-    tty: true
+    networks:
+      - oipa
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
       - eclipse_workspace:/home/developer/eclipse-workspace
       - eclipse_prefs:/home/developer/.eclipse
       - m2:/home/developer/.m2
       - git:/home/developer/git
       - scratch:/home/developer/scratch
       - ~/.gitconfig:/home/developer/.gitconfig
-      - ssh:/home/developer/.ssh
-    devices:
-      - "/dev/snd"
-    environment:
-      - DISPLAY=unix$DISPLAY
-    ports:
-      - 8080:8080
+      - ssh:/home/developer/ssh
 
 volumes:
   eclipse_workspace:
@@ -30,3 +23,7 @@ volumes:
   git:
   scratch:
   ssh:
+
+networks:
+  oipa:
+    external: true
