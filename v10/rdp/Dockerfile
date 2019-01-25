@@ -21,9 +21,10 @@ RUN mkdir -p /tmp/scripts
 COPY setup /tmp/scripts/
 RUN chmod +x /tmp/scripts/* && mv /tmp/scripts/* /usr/local/bin/
 
-CMD [ "setup" ]
+# Volumes
+RUN mkdir -p /home/ubuntu/scratch && chown ubuntu /home/ubuntu/scratch
+RUN mkdir -p /home/ubuntu/src && chown ubuntu /home/ubuntu/src
+VOLUME /home/ubuntu/scratch
+VOLUME /home/ubuntu/src
 
-# TODO: User that can run docker client
-#   sudo usermod -aG docker $USER
-# TODO: XSession permissions
-# TODO: Copy and Paste in RDP client
+CMD [ "setup" ]

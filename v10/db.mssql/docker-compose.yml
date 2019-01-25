@@ -1,0 +1,23 @@
+version: "3.3"
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - oipa
+    volumes:
+      - db-data:/var/opt/mssql
+      - scratch:/scratch
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+
+volumes:
+  db-data:
+  scratch:
+
+networks:
+  oipa:
+    external: true

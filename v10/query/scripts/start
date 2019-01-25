@@ -1,0 +1,35 @@
+#!/bin/bash
+
+HOME=/root
+USER_NAME=root
+
+copy_env() {
+  # rm -Rf ${HOME}/.profile
+  # mkdir -p ${HOME}/.ssh
+  # rm -Rf ${HOME}/.ssh/environment
+  touch /etc/profile.d/env_vars.sh
+  rm /etc/profile.d/env_vars.sh
+  touch ${HOME}/.pam_environment
+  rm ${HOME}/.pam_environment
+  for VAR in "$@"
+  do
+      echo "export ${VAR}=$(printenv ${VAR})" >> /etc/profile.d/env_vars.sh
+      echo "${VAR}=$(printenv ${VAR})" >> ${HOME}/.pam_environment
+      # echo "export ${VAR}=$(printenv ${VAR})" >> ${HOME}/.profile
+      # echo "export ${VAR}=$(printenv ${VAR})" >> ${HOME}/.ssh/environment
+  done
+  chown ${USER_NAME} ${HOME}/.pam_environment
+}
+
+# Copy Environment Variables
+copy_env DEBIAN_FRONTEND PATH USER_NAME
+
+# Setup SSH
+mkdir -p ${HOME}/.ssh
+cp ${HOME}/ssh/authorized_keys ${HOME}/.ssh
+chown -R ${USER_NAME} ${HOME}/.ssh
+chmod 755 ${HOME}/.ssh
+chmod 600 ${HOME}/.ssh/authorized_keys
+
+# SSH
+/usr/sbin/sshd && tail -f /dev/null

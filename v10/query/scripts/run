@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/opt/squirrel-sql-3.7/squirrel-sql.sh

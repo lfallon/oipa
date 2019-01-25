@@ -5,12 +5,26 @@ docker network create -d bridge --subnet 192.168.2.0/24 --gateway 192.168.2.1 oi
 
 ## Run Eclipse
 ```
-cd /src/v10
-docker-compose -p $(basename $(cd .. && pwd)) up -d
+cd ~/src/v10
+(cd eclipse && docker-compose -p $(basename $(cd .. && pwd)) up -d)
 ssh -X developer@eclipse run
 ```
 
+## Start MS SQL
+```
+cd ~/src/v10
+(cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+```
+
+## Start Query Tool
+```
+cd ~/src/v10
+(cd query && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+ssh -X root@query run
+```
+
 ## TODO
+# Script to setup Github credentials
 # WebSphere Container (app.websphere)
 # Database(s)
 ## SQL Server (db.mssql)
