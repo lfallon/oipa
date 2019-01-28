@@ -1,0 +1,88 @@
+#!/bin/bash
+
+usage() {
+  key="$1"
+  echo "Usage:"
+	case $key in
+		exe)
+			echo "${PROGRAM_NAME} exe -q [query] | -f [script]"
+			;;
+		query)
+			echo "${PROGRAM_NAME} query -q [query] | -f [script]"
+			;;
+		help|*)
+		  echo "${PROGRAM_NAME} [COMMAND]"
+			echo "  exe            Execute SQL Script"
+			echo "  query          Execute SQL Query"
+			;;
+	esac
+}
+
+unknown() {
+	echo "unknown command: $1"
+	echo
+	usage
+	exit 2
+}
+
+exe() {
+  while [[ $# > 0 ]]
+	do
+		key="$1"
+		shift
+		case $key in
+			-f*|--file)     FILENAME="$1"; shift ;;
+      -q*|--query)    QUERY="$1"; shift ;;
+			help)           usage ${FUNCNAME[0]} ;;
+			*)              unknown $key ;;
+		esac
+	done
+  if [ -z "$FILENAME" ] && [ -z "$QUERY" ] ; then
+    echo
+    echo Must specify a Script file or Query Text
+    echo
+    usage ${FUNCNAME[0]}
+  fi
+  if [ ! -z "$FILENAME" ] ; then
+    echo "SET NOCOUNT ON;" > /tmp/nocount.sql;
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -i "/tmp/nocount.sql,${FILENAME}";
+  else
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -Q "SET NOCOUNT ON; ${QUERY}";
+  fi
+}
+
+query() {
+  while [[ $# > 0 ]]
+	do
+		key="$1"
+		shift
+		case $key in
+			-f*|--file)     FILENAME="$1"; shift ;;
+      -q*|--query)    QUERY="$1"; shift ;;
+			help)           usage ${FUNCNAME[0]} ;;
+			*)              unknown $key ;;
+		esac
+	done
+  if [ -z "$FILENAME" ] && [ -z "$QUERY" ] ; then
+    echo
+    echo Must specify a Script file or Query Text
+    echo
+    usage ${FUNCNAME[0]}
+  fi
+  if [ ! -z "$FILENAME" ] ; then
+    echo "SET NOCOUNT ON;" > /tmp/nocount.sql;
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -r1 -W -i "/tmp/nocount.sql,${FILENAME}" | dos2unix;
+  else
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -r1 -W -Q "SET NOCOUNT ON; ${QUERY}" | dos2unix;
+  fi
+}
+
+COMMAND="help"
+if [[ $# > 0 ]] ; then	COMMAND=$1; fi
+shift
+
+case $COMMAND in
+	exe)	      exe "$@" ;;
+  query)      query "$@"  ;;
+	*)          usage $COMMAND ;;
+esac

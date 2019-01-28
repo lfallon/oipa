@@ -46,17 +46,29 @@ generate() {
   chmod 400 ${file}*
 }
 
+configured() {
+  local user=$1
+  [ -f /home/$user/.ssh/id_rsa ]
+}
+
 configure() {
    local user=$1
-   generate $user
-   server $user
-   client $user
+   if ! configured $user ; then
+     generate $user
+     server $user
+     client $user
+   fi
+   chown -R $user /home/$user/scratch
+   chown -R $user /home/$user/src
+   chown -R $user /home/$user/.ssh
 }
 
 # touch ~/.ssh/config
 # ls -lah ~/.ssh/config
 
 configure ubuntu   # Configures the ubuntu user
+
+
 
 # Grand Permissions
 # Generate Key

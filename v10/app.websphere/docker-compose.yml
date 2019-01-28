@@ -1,0 +1,30 @@
+version: "3.3"
+
+services:
+  oipa:
+    build:
+      context: ..
+      dockerfile: app.websphere/Dockerfile
+      args:
+        - OIPA_VERSION=${OIPA_VERSION}
+        - PALETTE_VERSION=${PALETTE_VERSION}
+        - DEBUGGER_VERSION=${DEBUGGER_VERSION}
+    networks:
+      - oipa
+#     volumes:
+#       - ./env/logs:/logs
+#       - ./env/oipa:/overrides
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - IVS=${IVS}
+      - IVS_DB_NAME=${IVS_DB_NAME}
+
+volumes:
+  scratch:
+
+networks:
+  oipa:
+    external: true

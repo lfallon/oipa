@@ -1,0 +1,5 @@
+/dist/
+/bin/
+.tmp
+/test-output/
+/build/

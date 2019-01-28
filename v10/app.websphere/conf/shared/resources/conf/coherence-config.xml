@@ -1,0 +1,28 @@
+<coherence xml-override="/tangosol-coherence-override.xml">
+	<cluster-config>
+		<member-identity>
+			<cluster-name>OIPA_CLUSTER</cluster-name>
+			<member-name>OIPA_MEMBERNAME</member-name>
+		</member-identity>
+		<unicast-listener>
+			<address>localhost</address>
+			<port>42222</port>
+			<port-auto-adjust>false</port-auto-adjust>
+			<well-known-addresses>
+				<socket-address id="1">
+					<address>localhost</address>
+					<port>42222</port>
+				</socket-address>
+			</well-known-addresses>
+		</unicast-listener>
+	</cluster-config>
+	<logging-config>
+		<destination>stdout</destination>
+		<!-- 0 - only output without a logging severity level specified will be 
+			logged 1 - all the above plus errors 2 - all the above plus warnings 3 - 
+			all the above plus informational messages 4-9 - all the above plus internal 
+			debugging messages (the higher the number, the more the messages) -1 - no 
+			messages -->
+		<severity-level>3</severity-level>
+	</logging-config>
+</coherence>

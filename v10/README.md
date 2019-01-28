@@ -3,6 +3,16 @@
 docker network create -d bridge --subnet 192.168.2.0/24 --gateway 192.168.2.1 oipa
 ```
 
+## Start
+```
+docker-compose up -d --build
+```
+
+## Stop
+```
+docker-compose down --remove-orphans
+```
+
 ## Run Eclipse
 ```
 cd ~/src/v10
@@ -13,7 +23,22 @@ ssh -X developer@eclipse run
 ## Start MS SQL
 ```
 cd ~/src/v10
-(cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+(cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) up -d --build)
+```
+
+## Restore Database Backup
+1. Download the database backup in the `scratch` folder.
+2. Run the restore command on the database container:
+    ```
+    cd ~/src/v10
+    (cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) exec db restore)
+    ```
+3. Pick the backup to restore if more than one is in the `scratch` folder
+
+# Start WebSphere
+```
+cd ~/src/v10
+(cd app.websphere && docker-compose -p $(basename $(cd .. && pwd)) up -d)
 ```
 
 ## Start Query Tool
@@ -27,10 +52,7 @@ ssh -X root@query run
 # Script to setup Github credentials
 # WebSphere Container (app.websphere)
 # Database(s)
-## SQL Server (db.mssql)
 # GUI -------
-# Eclipse
-# Query
 # Palette
 # Shortcuts
 ## Configure

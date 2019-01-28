@@ -1,6 +1,7 @@
 FROM microsoft/mssql-server-linux:2017-GA
 
-RUN apt-get update && apt-get install dos2unix
+RUN apt-get update && apt-get install dos2unix -y
+RUN apt-get update && apt-get install nano -y
 
 ENV ACCEPT_EULA=Y
 ENV SA_PASSWORD=SQLServerPass1
