@@ -31,7 +31,7 @@ cd ~/src/v10
 2. Run the restore command on the database container:
     ```
     cd ~/src/v10
-    (cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) exec db restore)
+    (cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) exec db restore interactive)
     ```
 3. Pick the backup to restore if more than one is in the `scratch` folder
 
@@ -57,7 +57,6 @@ ssh -X root@query run
 # Shortcuts
 ## Configure
 ### War File (how do download? use a shared volume maybe)
-### Db File (how do download? user a shared volume maybe)
 ## Develop
 
 ## Nice to have

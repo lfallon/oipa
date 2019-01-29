@@ -38,6 +38,25 @@ function ago() {
     fi
 }
 
+print_style () {
+    if [ "$2" == "info" ] ; then
+        COLOR="96m";
+    elif [ "$2" == "success" ] ; then
+        COLOR="92m";
+    elif [ "$2" == "warning" ] ; then
+        COLOR="93m";
+    elif [ "$2" == "danger" ] ; then
+        COLOR="91m";
+    else #default color
+        COLOR="0m";
+    fi
+
+    STARTCOLOR="\e[$COLOR";
+    ENDCOLOR="\e[0m";
+
+    printf "$STARTCOLOR%b$ENDCOLOR" "$1";
+}
+
 usage() {
   key="$1"
   echo "Usage:"
@@ -49,7 +68,7 @@ usage() {
 			echo "${PROGRAM_NAME} [OPTIONS] interactive"
 			;;
     file)
-			echo "${PROGRAM_NAME} [OPTIONS] file [FILENAME]"
+			echo "${PROGRAM_NAME} [OPTIONS] file [SELECTION]"
 			;;
 		help|*)
 		  echo "${PROGRAM_NAME} [COMMAND]"
@@ -64,37 +83,123 @@ list() {
   local DIRECTORY=/scratch
   shopt -s globstar
   cd $DIRECTORY
-  printf "%-20s %-45s %-15s" "DB" "File" "Last Modified"
+  printf "%-3s %-20s %-45s %-15s" "#" "DB" "File" "Last Modified"
   echo
-  printf "%-20s %-45s %-15s" "--------------" "------------------------------" "-------------------------"
+  printf "%-3s %-20s %-45s %-15s" "---" "--------------" "------------------------------" "-------------------------"
   echo
+  local INDEX=0
   for backup in **/*.bak; do
     local NAME=$(export ACTION=names && export BACKUP_PATH=$DIRECTORY/$backup && script query -f /sql/restore.sql)
     local LAST_MODIFIED=$(date -r $backup)
     local AGO=$(ago "$LAST_MODIFIED")
     local DATE=$(date -d "$LAST_MODIFIED" +%Y-%m-%d)
-    printf "%-20s %-45s %-15s" $NAME "$backup" "$DATE($AGO)"
+    INDEX=$(expr $INDEX + 1)
+    printf "%3s %-20s %-45s %-15s" "$INDEX)" $NAME "$backup" "$DATE($AGO)"
     echo
   done
 }
 
+# File of specified INDEX
+pathOf() {
+  local DIRECTORY=/scratch
+  shopt -s globstar
+  cd $DIRECTORY
+  local SELECTION=$1
+  local INDEX=1
+  for backup in **/*.bak; do
+    if [ $INDEX -eq $SELECTION ] ; then echo $DIRECTORY/$backup; fi
+    INDEX=$(expr $INDEX + 1)
+  done
+}
+
+# Db of specified INDEX
+nameOf() {
+  local SELECTION=$1
+  local NAME=$(export ACTION=names && export BACKUP_PATH=$(pathOf $SELECTION) && script query -f /sql/restore.sql)
+  echo $NAME
+}
+
+# Restore of specified INDEX
+restore() {
+  local SELECTION=$1
+  (export ACTION=execute && export BACKUP_PATH=$(pathOf $SELECTION) && script exe -f /sql/restore.sql)
+}
+
+# Print selection
+printSel() {
+  local SELECTION=$1
+  echo
+  print_style "Restore Database: "
+  print_style $(nameOf $SELECTION) "success"
+  echo
+  print_style "Backup: "
+  print_style $(pathOf $SELECTION) "success"
+  echo
+  echo
+}
+
+count() {
+  expr $(list | wc -l) - 2
+}
 
 interactive() {
-  echo interactive restore
-  # how many backups available?
-  # 1 => automatic
-  # 0 => exit with message
-  # >1 => user input to choose
+  # No Backups
+  if [ $(count) -eq 0 ]; then
+      echo "No Backups Found.";
+      exit 2;
+  fi
 
-  # call restore on backup file and print results
+  # One Backup
+  if [ $(count) -eq 1 ]; then
+    local SELECTION=1
+
+    printSel $SELECTION
+    restore $SELECTION
+
+    echo
+    echo
+    echo "Restore Complete."
+  fi
+
+  # More Than One
+  if [ $(count) -gt 1 ]; then
+      list
+
+      echo
+      echo "Please pick a Backup to restore:"
+      read SELECTION
+      while [[ ! $SELECTION =~ ^-?[0-9]+$ ]] || ([ $SELECTION -lt 1 ] || [ $SELECTION -gt $(count) ])
+      do
+        echo
+        echo "$SELECTION is not a valid selection."
+        echo
+        echo "Please pick a Backup to restore:"
+        read SELECTION
+      done
+
+      printSel $SELECTION
+      restore $SELECTION
+
+      echo
+      echo
+      echo "Restore Complete."
+  fi
 }
 
 file() {
-  echo restore file
+  local SELECTION=$1
+  if [[ ! $SELECTION =~ ^-?[0-9]+$ ]] || ([ $SELECTION -lt 1 ] || [ $SELECTION -gt $(count) ]) ; then
+    echo
+    echo "$SELECTION is not a valid selection."
+    exit 2
+  fi
 
-  # does the file exist and is it a backup?
-  # no => exit with message
-  # yes =>  call restore on backup file and print results
+  printSel $SELECTION
+  restore $SELECTION
+
+  echo
+  echo
+  echo "Restore Complete."
 }
 
 
