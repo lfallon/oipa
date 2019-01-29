@@ -1,1 +1,114 @@
 #!/bin/bash
+
+function ago() {
+    local SEC_PER_MINUTE=$((60))
+    local   SEC_PER_HOUR=$((60*60))
+    local    SEC_PER_DAY=$((60*60*24))
+    local  SEC_PER_MONTH=$((60*60*24*30))
+    local   SEC_PER_YEAR=$((60*60*24*365))
+
+    local last_unix="$(date --date="$1" +%s)"    # convert date to unix timestamp
+    local now_unix="$(date +'%s')"
+
+    local delta_s=$(( now_unix - last_unix ))
+
+    if (( delta_s <  SEC_PER_MINUTE * 2))
+    then
+        echo ""$((delta_s))" seconds ago"
+        return
+    elif (( delta_s <  SEC_PER_HOUR * 2))
+    then
+        echo ""$((delta_s / SEC_PER_MINUTE))" minutes ago"
+        return
+    elif (( delta_s <  SEC_PER_DAY * 2))
+    then
+        echo ""$((delta_s / SEC_PER_HOUR))" hours ago"
+        return
+    elif (( delta_s <  SEC_PER_MONTH * 2))
+    then
+        echo ""$((delta_s / SEC_PER_DAY))" days ago"
+        return
+    elif (( delta_s <  SEC_PER_YEAR * 2))
+    then
+        echo ""$((delta_s / SEC_PER_MONTH))" months ago"
+        return
+    else
+        echo ""$((delta_s / SEC_PER_YEAR))" years ago"
+        return
+    fi
+}
+
+usage() {
+  key="$1"
+  echo "Usage:"
+	case $key in
+		list)
+			echo "${PROGRAM_NAME} [OPTIONS] list"
+			;;
+		interactive)
+			echo "${PROGRAM_NAME} [OPTIONS] interactive"
+			;;
+    file)
+			echo "${PROGRAM_NAME} [OPTIONS] file [FILENAME]"
+			;;
+		help|*)
+		  echo "${PROGRAM_NAME} [COMMAND]"
+			echo "  list            List available backups"
+			echo "  interactive     Restore database backup with interactive input"
+      echo "  file            Restore the specified backup file"
+			;;
+	esac
+}
+
+list() {
+  local DIRECTORY=/scratch
+  shopt -s globstar
+  cd $DIRECTORY
+  printf "%-20s %-45s %-15s" "DB" "File" "Last Modified"
+  echo
+  printf "%-20s %-45s %-15s" "--------------" "------------------------------" "-------------------------"
+  echo
+  for backup in **/*.bak; do
+    local NAME=$(export ACTION=names && export BACKUP_PATH=$DIRECTORY/$backup && script query -f /sql/restore.sql)
+    local LAST_MODIFIED=$(date -r $backup)
+    local AGO=$(ago "$LAST_MODIFIED")
+    local DATE=$(date -d "$LAST_MODIFIED" +%Y-%m-%d)
+    printf "%-20s %-45s %-15s" $NAME "$backup" "$DATE($AGO)"
+    echo
+  done
+}
+
+
+interactive() {
+  echo interactive restore
+  # how many backups available?
+  # 1 => automatic
+  # 0 => exit with message
+  # >1 => user input to choose
+
+  # call restore on backup file and print results
+}
+
+file() {
+  echo restore file
+
+  # does the file exist and is it a backup?
+  # no => exit with message
+  # yes =>  call restore on backup file and print results
+}
+
+
+COMMAND="help"
+if [[ $# > 0 ]] ; then	COMMAND=$1; fi
+shift
+
+case $COMMAND in
+	list)	            list "$@" ;;
+  interactive)      interactive "$@"  ;;
+  file)             file "$@" ;;
+	*)                usage $COMMAND ;;
+esac
+
+# list backups that can be restored
+# interactive restore
+# restore specified file

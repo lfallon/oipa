@@ -44,8 +44,7 @@ exe() {
     usage ${FUNCNAME[0]}
   fi
   if [ ! -z "$FILENAME" ] ; then
-    echo "SET NOCOUNT ON;" > /tmp/nocount.sql;
-    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -i "/tmp/nocount.sql,${FILENAME}";
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -i "${FILENAME}";
   else
     /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -Q "SET NOCOUNT ON; ${QUERY}";
   fi
@@ -70,8 +69,7 @@ query() {
     usage ${FUNCNAME[0]}
   fi
   if [ ! -z "$FILENAME" ] ; then
-    echo "SET NOCOUNT ON;" > /tmp/nocount.sql;
-    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -r1 -W -i "/tmp/nocount.sql,${FILENAME}" | dos2unix;
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -r1 -W -i "${FILENAME}" | dos2unix;
   else
     /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -d master -s, -h-1 -r1 -W -Q "SET NOCOUNT ON; ${QUERY}" | dos2unix;
   fi
