@@ -12,6 +12,7 @@ services:
       - .:/home/ubuntu/src/v10
       - ssh:/home/ubuntu/.ssh
       - scratch:/home/ubuntu/scratch:Z
+      - ~/.gitconfig:/home/ubuntu/.gitconfig
     ports:
       - 3389:3389
 

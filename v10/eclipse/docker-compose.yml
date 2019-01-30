@@ -13,7 +13,7 @@ services:
       - m2:/home/developer/.m2
       - git:/home/developer/git
       - scratch:/home/developer/scratch
-      - ~/.gitconfig:/home/developer/.gitconfig
+  #    - ~/.gitconfig:/home/developer/.gitconfig
       - ssh:/home/developer/ssh
 
 volumes:
@@ -23,6 +23,7 @@ volumes:
   git:
   scratch:
   ssh:
+  overrides:
 
 networks:
   oipa:

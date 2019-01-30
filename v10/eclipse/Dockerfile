@@ -36,6 +36,10 @@ RUN mkdir -p /tmp/scripts
 COPY scripts/ /tmp/scripts/
 RUN chmod +x /tmp/scripts/* && mv /tmp/scripts/* /usr/local/bin/
 
+# Environment Variables
+ENV OIPA_TOOLS_SOURCE=${HOME}/git/oipa-tools
+ENV DEBUGGER_SOURCE=${OIPA_TOOLS_SOURCE}/debugger-v10
+
 # Volumes
 USER ${USER_NAME}
 RUN mkdir -p ${HOME}/.m2

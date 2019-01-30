@@ -11,9 +11,10 @@ services:
         - DEBUGGER_VERSION=${DEBUGGER_VERSION}
     networks:
       - oipa
-#     volumes:
+    volumes:
 #       - ./env/logs:/logs
-#       - ./env/oipa:/overrides
+      - scratch:/scratch
+
     environment:
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
@@ -23,6 +24,7 @@ services:
       - IVS_DB_NAME=${IVS_DB_NAME}
 
 volumes:
+  scratch:
   scratch:
 
 networks:

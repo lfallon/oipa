@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Run
+su - $USER_NAME -c "mkdir -p ${HOME}/scratch/extensions"
+su - $USER_NAME -c "cd ${DEBUGGER_SOURCE} && mvn clean install"
+su - $USER_NAME -c "cp ${DEBUGGER_SOURCE}/dist/debugger-v10-*.jar ${HOME}/scratch/extensions"
+su - $USER_NAME -c "cp ${DEBUGGER_SOURCE}/src/main/config/extensions.xml ${HOME}/scratch/extensions"

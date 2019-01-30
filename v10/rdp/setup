@@ -59,6 +59,7 @@ configure() {
      client $user
    fi
    chown -R $user /home/$user/scratch
+   chown -R $user /home/$user/scratch/*
    chown -R $user /home/$user/src
    chown -R $user /home/$user/.ssh
 }

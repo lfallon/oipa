@@ -69,16 +69,11 @@ RUN chmod +x /tmp/scripts/* && mv /tmp/scripts/* /usr/local/bin/
 # Shared
 COPY app.websphere/conf/shared/ /opt/ibm/wlp/usr/shared/
 
-# Logs
-RUN mkdir -p /logs
-VOLUME /logs
-
-# Override Config
-RUN mkdir -p /overrides
-VOLUME /overrides
+# Scratch
+RUN mkdir -p /scratch/logs
 
 # Environment Variables
-ENV LOG_DIR=/logs
+ENV LOG_DIR=/scratch/logs
 ENV JVM_ARGS="-Xms512m -Xmx1024m -Dwas.debug.mode=true -Dcom.ibm.websphere.ras.inject.at.transform=true -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7777"
 ENV DB_HOST=104.208.247.218
 ENV DB_NAME=OIPA_GA
@@ -92,12 +87,6 @@ EXPOSE 7777
 
 CMD ["bootstrap"]
 
-
-# Test
-# BUILD_ARGS=$(cat .env | grep -v ^# | grep -v -e '^[[:space:]]*$' | awk '$0="--build-arg "$0' | xargs) && docker build $BUILD_ARGS -t local/oipa .
-# docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 local/oipa; docker logs -f oipa
-# docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /tmp/logs:/logs -e DB_NAME=OIPA_POC local/oipa; docker logs -f oipa
-# docker stop oipa; docker rm oipa; docker run -d --name oipa -p 9080:9080 -p 7777:7777 -v /home/vagrant/git/oipa-tools/debugger-v10/dist:/extensions -e DB_NAME=OIPA_Securian local/oipa; docker logs -f oipa
 
 # Notes
 # Directory Structure:

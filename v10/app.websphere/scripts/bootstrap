@@ -30,15 +30,34 @@ fi
 EXTENSIONS_UPDATED_FILE=/extensions/updated.txt
 EXTENSIONS_UPDATED="Unknown"
 if [ -f $EXTENSIONS_UPDATED_FILE ]; then
-   EXTENSIONS_UPDATED=$(cat $EXTENSIONS_UPDATED_FILE)
+  EXTENSIONS_UPDATED=$(cat $EXTENSIONS_UPDATED_FILE)
 fi
 echo Extensions Updated: $EXTENSIONS_UPDATED
 
-# Override
-if [ -f /overrides/PAS.properties ]; then
-    echo "PAS.properties Override Found!"
-    cp -Rf /overrides/PAS.properties /opt/ibm/wlp/usr/shared/resources/conf/PAS.properties
+# Overrides: PAS.properties
+if [ -f /scratch/PAS.properties ]; then
+  echo "PAS.properties Override Found!"
+  cp -Rf /scratch/PAS.properties /opt/ibm/wlp/usr/shared/resources/conf/PAS.properties
 fi
+
+# Overrides: Extensions
+if [ -d /scratch/extensions ] && [ "$(ls -A /scratch/extensions)" ] ; then
+  echo "Extensions Override Found!"
+  rm -Rf /extensions/*
+  cp -Rf /scratch/extensions/* /extensions/
+fi
+
+# Overrides: War
+WAR_FILE=$(ls /scratch/*.war -Art 2> /dev/null | tail -n 1)
+if [ "$WAR_FILE" ] ; then
+  echo "PAS War Override Found!  =>  $WAR_FILE"
+  cp $WAR_FILE /config/apps/PASJava.war
+fi
+
+# Logs
+mkdir -p $LOG_DIR
+chmod -R +r $LOG_DIR
+while true; do sleep 2; chmod -R +r $LOG_DIR/*; done &
 
 # Start
 /opt/ibm/wlp/bin/server run defaultServer

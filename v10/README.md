@@ -15,30 +15,39 @@ docker-compose down --remove-orphans
 
 ## Run Eclipse
 ```
-cd ~/src/v10
-(cd eclipse && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+cd ~/src/v10/eclipse
+(docker-compose -p $(basename $(cd .. && pwd)) up -d --build)
 ssh -X developer@eclipse run
 ```
 
 ## Start MS SQL
 ```
-cd ~/src/v10
-(cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) up -d --build)
+cd ~/src/v10/db.mssql
+(docker-compose -p $(basename $(cd .. && pwd)) up -d --build)
 ```
 
 ## Restore Database Backup
 1. Download the database backup in the `scratch` folder.
 2. Run the restore command on the database container:
     ```
-    cd ~/src/v10
-    (cd db.mssql && docker-compose -p $(basename $(cd .. && pwd)) exec db restore interactive)
+    cd ~/src/v10/db.mssql
+    (docker-compose -p $(basename $(cd .. && pwd)) exec db restore interactive)
     ```
 3. Pick the backup to restore if more than one is in the `scratch` folder
 
-# Start WebSphere
+## Start WebSphere
+### NO IVS
+Export the name of the database as the variable `DB_NAME` before starting.
 ```
-cd ~/src/v10
-(cd app.websphere && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+cd ~/src/v10/app.websphere
+export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose -p $(basename $(cd .. && pwd)) up -d --build
+```
+
+### IVS
+Export the name of the database as the variables `DB_NAME`, `IVS`, and `IVS_DB_NAME` before starting.
+```
+cd ~/src/v10/app.websphere
+(export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $(basename $(cd .. && pwd)) up -d)
 ```
 
 ## Start Query Tool
@@ -46,6 +55,14 @@ cd ~/src/v10
 cd ~/src/v10
 (cd query && docker-compose -p $(basename $(cd .. && pwd)) up -d)
 ssh -X root@query run
+```
+
+## Build / Deploy Extensions
+```
+cd ~/src/v10/eclipse
+docker-compose -p $(basename $(cd .. && pwd)) exec eclipse build
+cd ~/src/v10/app.websphere
+docker-compose -p $(basename $(cd .. && pwd)) restart oipa
 ```
 
 ## TODO

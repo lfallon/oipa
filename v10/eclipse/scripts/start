@@ -19,7 +19,7 @@ copy_env() {
 }
 
 # Copy Environment Variables
-copy_env DEBIAN_FRONTEND ECLIPSE_VERSION ECLIPSE_WORKSPACE GRADLE_HOME HOSTNAME INSTALL_DIR JAVA_HOME MAVEN_HOME MAVEN_VERSION PATH USER_NAME
+copy_env DEBIAN_FRONTEND ECLIPSE_VERSION ECLIPSE_WORKSPACE GRADLE_HOME HOSTNAME INSTALL_DIR JAVA_HOME MAVEN_HOME MAVEN_VERSION PATH USER_NAME OIPA_TOOLS_SOURCE DEBUGGER_SOURCE
 
 # Setup SSH
 mkdir -p /home/${USER_NAME}/.ssh
@@ -27,6 +27,13 @@ cp /home/${USER_NAME}/ssh/authorized_keys /home/${USER_NAME}/.ssh
 chown -R ${USER_NAME} /home/${USER_NAME}/.ssh
 chmod 755 /home/${USER_NAME}/.ssh
 chmod 600 /home/${USER_NAME}/.ssh/authorized_keys
+
+# Permissions
+chown -R $USER_NAME:$USER_NAME ${HOME}/.eclipse
+chown -R $USER_NAME:$USER_NAME ${ECLIPSE_WORKSPACE}
+chown -R $USER_NAME:$USER_NAME ${HOME}/git
+chown -R $USER_NAME:$USER_NAME ${HOME}/.m2
+chown -R $USER_NAME:$USER_NAME ${HOME}/scratch
 
 # SSH
 /usr/sbin/sshd && tail -f /dev/null
