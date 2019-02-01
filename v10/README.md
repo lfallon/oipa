@@ -23,7 +23,7 @@ ssh -X developer@eclipse run
 ## Start MS SQL
 ```
 cd ~/src/v10/db.mssql
-(docker-compose -p $(basename $(cd .. && pwd)) up -d --build)
+docker-compose -p $(basename $(cd .. && pwd)) up -d --build
 ```
 
 ## Restore Database Backup
@@ -52,9 +52,24 @@ cd ~/src/v10/app.websphere
 
 ## Start Query Tool
 ```
-cd ~/src/v10
-(cd query && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+cd ~/src/v10/query
+docker-compose -p $(basename $(cd .. && pwd)) up -d
 ssh -X root@query run
+```
+
+## Start Palette
+### NO IVS
+```
+cd ~/src/v10/palette
+export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose -p $(basename $(cd .. && pwd)) up -d --build
+ssh -X jboss@palette run
+```
+
+### IVS
+```
+cd ~/src/v10/palette
+export export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $(basename $(cd .. && pwd)) up -d --build
+ssh -X jboss@palette run
 ```
 
 ## Build / Deploy Extensions

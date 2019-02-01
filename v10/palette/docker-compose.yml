@@ -1,0 +1,28 @@
+version: "3.3"
+
+services:
+  palette:
+    build:
+      context: ..
+      dockerfile: palette/Dockerfile
+    networks:
+      - oipa
+    volumes:
+      - ssh:/root/ssh
+      - scratch:/opt/jboss/scratch
+      - overrides:/opt/jboss/overrides
+    environment:
+      - PALETTE_URL=http://oipa:9080/PaletteConfig
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - IVS=${IVS}
+      - IVS_DB_NAME=${IVS_DB_NAME}
+
+volumes:
+  scratch:
+  ssh:
+  overrides:
+
+networks:
+  oipa:
+    external: true
