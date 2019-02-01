@@ -16,7 +16,7 @@ docker-compose down --remove-orphans
 ## Run Eclipse
 ```
 cd ~/src/v10/eclipse
-(docker-compose -p $(basename $(cd .. && pwd)) up -d --build)
+docker-compose -p $(basename $(cd .. && pwd)) up -d --build
 ssh -X developer@eclipse run
 ```
 
@@ -31,7 +31,7 @@ docker-compose -p $(basename $(cd .. && pwd)) up -d --build
 2. Run the restore command on the database container:
     ```
     cd ~/src/v10/db.mssql
-    (docker-compose -p $(basename $(cd .. && pwd)) exec db restore interactive)
+    docker-compose -p $(basename $(cd .. && pwd)) exec db restore interactive
     ```
 3. Pick the backup to restore if more than one is in the `scratch` folder
 
@@ -47,7 +47,7 @@ export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose -p $(basename 
 Export the name of the database as the variables `DB_NAME`, `IVS`, and `IVS_DB_NAME` before starting.
 ```
 cd ~/src/v10/app.websphere
-(export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $(basename $(cd .. && pwd)) up -d)
+export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $(basename $(cd .. && pwd)) up -d
 ```
 
 ## Start Query Tool
