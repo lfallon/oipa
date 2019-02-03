@@ -74,10 +74,10 @@ ssh -X jboss@palette run
 
 ## Build / Deploy Extensions
 ```
-cd ~/src/v10/eclipse
-docker-compose -p $(basename $(cd .. && pwd)) exec eclipse build
-cd ~/src/v10/app.websphere
-docker-compose -p $(basename $(cd .. && pwd)) restart oipa
+cd ~/src/v10/eclipse && \
+  docker-compose -p $(basename $(cd .. && pwd)) exec eclipse build && \
+  cd ~/src/v10/app.websphere && \
+  docker-compose -p $(basename $(cd .. && pwd)) restart oipa
 ```
 
 ## TODO

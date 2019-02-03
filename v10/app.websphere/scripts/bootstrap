@@ -45,6 +45,7 @@ if [ -d /scratch/extensions ] && [ "$(ls -A /scratch/extensions)" ] ; then
   echo "Extensions Override Found!"
   rm -Rf /extensions/*
   cp -Rf /scratch/extensions/* /extensions/
+  # cp /scratch/extensions/*.jar /opt/ibm/wlp/usr/shared/resources/oipa/
 fi
 
 # Overrides: War

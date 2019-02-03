@@ -21,6 +21,17 @@ RUN mkdir /root/.ssh \
   && chmod 700 /root/.ssh \
   && ssh-keygen -A
 
+# Eclipse Plugins
+RUN sudo chown -R $USER_NAME:$USER_NAME /home/developer/.eclipse
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,https://ecd-plugin.github.io/update/ -installIU org.sf.feeling.decompiler.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,https://ecd-plugin.github.io/update/ -installIU org.sf.feeling.decompiler.cfr.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,https://ecd-plugin.github.io/update/ -installIU org.sf.feeling.decompiler.jad.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,https://ecd-plugin.github.io/update/ -installIU org.sf.feeling.decompiler.jd.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,https://ecd-plugin.github.io/update/ -installIU org.sf.feeling.decompiler.procyon.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,https://ecd-plugin.github.io/update/ -installIU org.sf.feeling.decompiler.source.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt/ -installIU org.jboss.tools.maven.apt.feature.feature.group
+RUN /opt/eclipse/eclipse -nosplash -application org.eclipse.equinox.p2.director -repository http://download.eclipse.org/releases/oxygen/,http://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-tycho/0.7.0/N/0.7.0.201309291400/ -installIU org.sonatype.tycho.m2e.feature.feature.group
+
 # Eclipse Settings
 RUN sed -i -e 's/Xmx1024m/Xmx10536m/g' /opt/eclipse/eclipse.ini
 
