@@ -1,0 +1,120 @@
+#!/bin/bash
+PROGRAM_NAME=$(basename $0)
+DIR=~/src/v10/app.websphere
+
+_status() {
+  echo "$(cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) ps $1 | awk '{if(NR>2)print}')"
+}
+
+usage() {
+  key="$1"
+  echo "Usage:"
+	case $key in
+		start)
+			echo "${PROGRAM_NAME} start [OPTIONS]"
+      echo "  -d(--db) OIPA <database> (REQUIRED)"
+      echo "  -i(--ivs) OIPA IVS <database> (OPTIONAL)"
+			;;
+		stop)
+			echo "${PROGRAM_NAME} stop [OPTIONS]"
+			;;
+    restart)
+			echo "${PROGRAM_NAME} restart"
+			;;
+		help|*)
+		  echo "${PROGRAM_NAME} [COMMAND]"
+			echo "  start          Start MS SQL Server"
+			echo "  stop           Stop running MS SQL Server"
+      echo "  restart        Restart running MS SQL Server"
+      echo "  status         Status of MS SQL Server"
+			;;
+	esac
+}
+
+unknown_param() {
+	echo "unknown parameter: $1"
+	exit 2
+}
+
+started() {
+  [ -n "$(_status oipa | grep Up | xargs)" ]
+}
+
+hold() {
+  while ! started
+  do
+      echo "Waiting to start"
+      sleep 1
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+status() {
+  local result="Down"
+  if started ; then result="Up"; fi
+  echo "$result"
+}
+
+start() {
+  # Parameters
+  local db=
+  local ivs=
+  local ivs_flag=false
+  while [[ $# > 0 ]]
+  do
+    key="$1"
+    shift
+    case $key in
+      -d*|--db)       db="$1"; shift	;;
+      -i*|--ivs)      ivs="$1"; ivs_flag=true; shift ;;
+      help)           usage ${FUNCNAME[0]} ;;
+      *)              unknown_param $key ;;
+    esac
+  done
+  if [ -z "$db" ];then
+      echo
+      echo OIPA database must be specified
+      echo
+      usage ${FUNCNAME[0]}
+      exit 2
+  fi
+  if ! started ; then
+    echo "Starting WebSphere"
+    echo "  OIPA DB: ${db}"
+    echo "  OIPA IVS: ${ivs_flag}"
+    if [ ! -z "$ivs" ]; then
+      echo "  OIPA IVS DB: ${ivs}"
+    fi
+    (cd $DIR && export DB_NAME=${db} && export IVS=${ivs_flag} && export IVS_DB_NAME=${ivs} && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
+    hold
+    echo "WebSphere Started"
+  else
+    echo "WebSphere Already Started"
+  fi
+}
+
+stop() {
+  echo "Stopping WebSphere"
+  (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) down > /dev/null 2>&1)
+  echo "WebSphere Stopped"
+}
+
+restart() {
+  stop;
+  start;
+}
+
+COMMAND="start"
+if [[ $# > 0 ]] ; then	COMMAND=$1; fi
+shift
+
+case $COMMAND in
+	start)	    start $@ ;;
+  stop)       stop $@  ;;
+  restart)    restart $@ ;;
+  status)     status $@ ;;
+	*)          usage $COMMAND ;;
+esac

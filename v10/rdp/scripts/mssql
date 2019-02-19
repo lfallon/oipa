@@ -1,0 +1,89 @@
+#!/bin/bash
+PROGRAM_NAME=$(basename $0)
+DIR=~/src/v10/db.mssql
+
+_status() {
+  # echo "$(cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) ps $1 | grep Up | xargs)";
+  echo "$(cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) ps $1 | awk '{if(NR>2)print}')"
+}
+
+started() {
+  [ -n "$(_status db | grep Up | xargs)" ]
+}
+
+status() {
+  local result="Down"
+  if started ; then result="Up"; fi
+  echo "$result"
+}
+
+hold() {
+  while ! started
+  do
+      echo "Waiting to start"
+      sleep 1
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+start() {
+  if ! started ; then
+    echo "Starting MS SQL"
+    (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
+    hold
+    echo "MS SQL Started"
+  else
+    echo "MS SQL Already Started"
+  fi
+}
+
+stop() {
+  echo "Stopping MS SQL"
+  (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) down > /dev/null 2>&1)
+  echo "MS SQL Stopped"
+}
+
+restart() {
+  stop;
+  start;
+}
+
+usage() {
+  key="$1"
+  echo "Usage:"
+	case $key in
+		start)
+			echo "${PROGRAM_NAME} start [OPTIONS]"
+			;;
+		stop)
+			echo "${PROGRAM_NAME} stop [OPTIONS]"
+			;;
+    restart)
+			echo "${PROGRAM_NAME} restart"
+			;;
+		help|*)
+		  echo "${PROGRAM_NAME} [COMMAND]"
+			echo "  start          Start MS SQL Server"
+			echo "  stop           Stop running MS SQL Server"
+      echo "  restart        Restart running MS SQL Server"
+      echo "  status         Status of MS SQL Server"
+			;;
+	esac
+}
+
+COMMAND="start"
+if [[ $# > 0 ]] ; then	COMMAND=$1; fi
+shift
+
+case $COMMAND in
+	start)	    start $@ ;;
+  stop)       stop $@  ;;
+  restart)    restart $@ ;;
+  status)     status $@ ;;
+	*)          usage $COMMAND ;;
+esac
+
+# start, stop, help, restart

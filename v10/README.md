@@ -47,7 +47,7 @@ export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose -p $(basename 
 Export the name of the database as the variables `DB_NAME`, `IVS`, and `IVS_DB_NAME` before starting.
 ```
 cd ~/src/v10/app.websphere
-export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $(basename $(cd .. && pwd)) up -d
+export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $  (basename $(cd .. && pwd)) up -d
 ```
 
 ## Start Query Tool
@@ -58,17 +58,9 @@ ssh -X root@query run
 ```
 
 ## Start Palette
-### NO IVS
 ```
 cd ~/src/v10/palette
-export IVS=false && export DB_NAME=OIPA_SandBox && docker-compose -p $(basename $(cd .. && pwd)) up -d --build
-ssh -X jboss@palette run
-```
-
-### IVS
-```
-cd ~/src/v10/palette
-export export DB_NAME=OIPA_SandBox && export IVS=true && export IVS_DB_NAME=OIPA_IVS && docker-compose -p $(basename $(cd .. && pwd)) up -d --build
+docker-compose -p $(basename $(cd .. && pwd)) up -d --build
 ssh -X jboss@palette run
 ```
 

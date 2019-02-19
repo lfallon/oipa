@@ -1,0 +1,92 @@
+#!/bin/bash
+PROGRAM_NAME=$(basename $0)
+DIR=~/src/v10/query
+
+_status() {
+  echo "$(cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) ps $1 | awk '{if(NR>2)print}')"
+}
+
+usage() {
+  key="$1"
+  echo "Usage:"
+	case $key in
+		start)
+			echo "${PROGRAM_NAME} start [OPTIONS]"
+      ;;
+		stop)
+			echo "${PROGRAM_NAME} stop [OPTIONS]"
+			;;
+    restart)
+			echo "${PROGRAM_NAME} restart"
+			;;
+		help|*)
+		  echo "${PROGRAM_NAME} [COMMAND]"
+			echo "  start          Start Squirrel SQL Tool"
+			echo "  stop           Stop running Squirrel SQL Tool"
+      echo "  restart        Restart running Squirrel SQL Tool"
+      echo "  status         Status of Squirrel SQL Tool"
+			;;
+	esac
+}
+
+unknown_param() {
+	echo "unknown parameter: $1"
+	exit 2
+}
+
+started() {
+  [ -n "$(_status query | grep Up | xargs)" ]
+}
+
+hold() {
+  while ! started
+  do
+      echo "Waiting to start"
+      sleep 1
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+status() {
+  local result="Down"
+  if started ; then result="Up"; fi
+  echo "$result"
+}
+
+start() {
+  if ! started ; then
+    echo "Starting Squirrel SQL"
+    (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
+    hold
+    ssh -X -oStrictHostKeyChecking=no root@query run
+    echo "Squirrel SQL Started"
+  else
+    echo "Squirrel SQL Already Started"
+  fi
+}
+
+stop() {
+  echo "Stopping Squirrel SQL"
+  (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) down > /dev/null 2>&1)
+  echo "Squirrel SQL Stopped"
+}
+
+restart() {
+  stop;
+  start;
+}
+
+COMMAND="start"
+if [[ $# > 0 ]] ; then	COMMAND=$1; fi
+shift
+
+case $COMMAND in
+	start)	    start $@ ;;
+  stop)       stop $@  ;;
+  restart)    restart $@ ;;
+  status)     status $@ ;;
+	*)          usage $COMMAND ;;
+esac

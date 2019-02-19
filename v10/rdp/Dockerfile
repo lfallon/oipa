@@ -13,6 +13,13 @@ RUN apt-get update && apt-get install net-tools xorg openbox iputils-ping nmap -
 RUN apt-get update && apt-get install openssh-client gvfs-fuse gvfs-backends -y
 RUN apt-get update && apt-get install gedit -y
 RUN apt-get update && apt-get install file-roller -y
+RUN apt-get update && apt-get install nano -y
+RUN add-apt-repository -y ppa:tista/adapta && apt-get update && apt-get install adapta-gtk-theme -y
+RUN apt-get update && apt-get install fonts-roboto fonts-noto -y
+RUN add-apt-repository -y ppa:papirus/papirus && apt-get update && apt-get install papirus-icon-theme -y
+RUN apt-get update && apt-get install tilix -y
+RUN apt-get purge xscreensaver -y
+RUN apt-get update && apt-get install xfce4-whiskermenu-plugin mugshot -y
 
 RUN curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && \
   chmod +x /usr/local/bin/docker-compose && \
@@ -20,8 +27,13 @@ RUN curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-co
 
 # Scripts
 RUN mkdir -p /tmp/scripts
-COPY setup /tmp/scripts/
+COPY scripts/ /tmp/scripts/
 RUN chmod +x /tmp/scripts/* && mv /tmp/scripts/* /usr/local/bin/
+
+# TODO
+# Keyboard Shortcuts
+# Selected Theme
+# Panel Plugins / Positions
 
 # Volumes
 RUN mkdir -p /home/ubuntu/scratch && chown ubuntu /home/ubuntu/scratch
