@@ -61,11 +61,20 @@ start() {
     echo "Starting Squirrel SQL"
     (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
     hold
-    ssh -X -oStrictHostKeyChecking=no root@query run
     echo "Squirrel SQL Started"
   else
     echo "Squirrel SQL Already Started"
   fi
+
+  # Open Squirrel
+  local tryCount=0
+  local tryLimit=3
+  until [ $tryCount -ge $tryLimit ]
+  do
+      ssh -X -oStrictHostKeyChecking=no root@query run && break
+      tryCount=$[tryCountn+1]
+      sleep 1
+  done
 }
 
 stop() {

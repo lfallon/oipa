@@ -27,6 +27,7 @@ RUN curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-co
 
 # Icons
 COPY icons/scalable/ /usr/share/icons/hicolor/scalable/apps/
+COPY icons/48x48/ /usr/share/icons/hicolor/48x48/apps/
 
 # Scripts
 RUN mkdir -p /tmp/scripts

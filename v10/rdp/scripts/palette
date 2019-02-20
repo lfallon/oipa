@@ -61,11 +61,20 @@ start() {
     echo "Starting OIPA Palette"
     (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
     hold
-    ssh -X -oStrictHostKeyChecking=no jboss@palette run
     echo "OIPA Palette Started"
   else
     echo "OIPA Palette Already Started"
   fi
+
+  # Open Palette
+  local tryCount=0
+  local tryLimit=3
+  until [ $tryCount -ge $tryLimit ]
+  do
+      ssh -X -oStrictHostKeyChecking=no jboss@palette run && break
+      tryCount=$[tryCountn+1]
+      sleep 1
+  done
 }
 
 stop() {

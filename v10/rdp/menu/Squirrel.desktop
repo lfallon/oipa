@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Squirrel SQL
+Comment=SQL Querry Tool
+Exec=query
+Icon=/usr/share/icons/hicolor/scalable/apps/squirrel.svg
+Categories=Programming;Development;SQL;Database

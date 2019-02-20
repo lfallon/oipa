@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Palette
+Comment=OIPA Rules Palette
+Exec=palette
+Icon=/usr/share/icons/hicolor/48x48/apps/palette.png
+Categories=Programming;Development;OIPA;Oracle
