@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Eclipse
+Comment=Eclipse Java IDE
+Exec=eclipse
+Icon=/usr/share/icons/hicolor/scalable/apps/eclipse.svg
+Categories=Programming;Development;Java

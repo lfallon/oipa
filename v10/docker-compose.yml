@@ -9,10 +9,11 @@ services:
       - oipa
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - ~/.gitconfig:/home/ubuntu/.gitconfig
       - .:/home/ubuntu/src/v10
       - ssh:/home/ubuntu/.ssh
       - scratch:/home/ubuntu/scratch:Z
-      - ~/.gitconfig:/home/ubuntu/.gitconfig
     ports:
       - 3389:3389
 

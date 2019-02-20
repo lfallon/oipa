@@ -25,15 +25,22 @@ RUN curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-co
   chmod +x /usr/local/bin/docker-compose && \
   docker-compose --version
 
+# Icons
+COPY icons/scalable/ /usr/share/icons/hicolor/scalable/apps/
+
 # Scripts
 RUN mkdir -p /tmp/scripts
 COPY scripts/ /tmp/scripts/
 RUN chmod +x /tmp/scripts/* && mv /tmp/scripts/* /usr/local/bin/
 
+# Menu
+COPY menu/ /usr/share/applications/
+
+# Desktop
+COPY config/xfce4/ /etc/xdg/xfce4/
+
 # TODO
-# Keyboard Shortcuts
 # Selected Theme
-# Panel Plugins / Positions
 
 # Volumes
 RUN mkdir -p /home/ubuntu/scratch && chown ubuntu /home/ubuntu/scratch

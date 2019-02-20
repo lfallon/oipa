@@ -1,0 +1,101 @@
+#!/bin/bash
+PROGRAM_NAME=$(basename $0)
+DIR=~/src/v10/eclipse
+
+_status() {
+  echo "$(cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) ps $1 | awk '{if(NR>2)print}')"
+}
+
+usage() {
+  key="$1"
+  echo "Usage:"
+	case $key in
+		start)
+			echo "${PROGRAM_NAME} start [OPTIONS]"
+      ;;
+		stop)
+			echo "${PROGRAM_NAME} stop [OPTIONS]"
+			;;
+    restart)
+			echo "${PROGRAM_NAME} restart"
+			;;
+		help|*)
+		  echo "${PROGRAM_NAME} [COMMAND]"
+			echo "  start          Start Eclipse"
+			echo "  stop           Stop running Eclipse"
+      echo "  restart        Restart running Eclipse"
+      echo "  status         Status of Eclipse"
+			;;
+	esac
+}
+
+unknown_param() {
+	echo "unknown parameter: $1"
+	exit 2
+}
+
+started() {
+  [ -n "$(_status eclipse | grep Up | xargs)" ]
+}
+
+hold() {
+  while ! started
+  do
+      echo "Waiting to start"
+      sleep 1
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+status() {
+  local result="Down"
+  if started ; then result="Up"; fi
+  echo "$result"
+}
+
+start() {
+  if ! started ; then
+    echo "Starting Eclipse"
+    (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
+    hold
+    echo "Eclipse Started"
+  else
+    echo "Eclipse Already Started"
+  fi
+
+  # Open Eclipse
+  local tryCount=0
+  local tryLimit=3
+  until [ $tryCount -ge $tryLimit ]
+  do
+      ssh -X -oStrictHostKeyChecking=no developer@eclipse run && break
+      tryCount=$[tryCountn+1]
+      sleep 1
+  done
+}
+
+stop() {
+  echo "Stopping Eclipse"
+  (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) down > /dev/null 2>&1)
+  echo "Eclipse Stopped"
+}
+
+restart() {
+  stop;
+  start;
+}
+
+COMMAND="start"
+if [[ $# > 0 ]] ; then	COMMAND=$1; fi
+shift
+
+case $COMMAND in
+	start)	    start $@ ;;
+  stop)       stop $@  ;;
+  restart)    restart $@ ;;
+  status)     status $@ ;;
+	*)          usage $COMMAND ;;
+esac
