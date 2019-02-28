@@ -68,7 +68,7 @@ start() {
 
   # Open Squirrel
   local tryCount=0
-  local tryLimit=3
+  local tryLimit=5
   until [ $tryCount -ge $tryLimit ]
   do
       ssh -X -oStrictHostKeyChecking=no root@query run && break

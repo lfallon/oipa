@@ -14,12 +14,14 @@ services:
       - .:/home/ubuntu/src/v10
       - ssh:/home/ubuntu/.ssh
       - scratch:/home/ubuntu/scratch:Z
+      - git:/home/ubuntu/git
     ports:
       - 3389:3389
 
 volumes:
   ssh:
   scratch:
+  git:
 
 networks:
   oipa:

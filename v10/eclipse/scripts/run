@@ -2,4 +2,10 @@
 
 # Run
 su - $USER_NAME
+
+touch ${HOME}/.gitconfig
+if [ -f ${HOME}/git/.gitconfig ] ; then
+  cp -f ${HOME}/git/.gitconfig ${HOME}/.gitconfig
+fi
+
 /opt/eclipse/eclipse

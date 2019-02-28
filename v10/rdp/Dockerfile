@@ -20,6 +20,7 @@ RUN add-apt-repository -y ppa:papirus/papirus && apt-get update && apt-get insta
 RUN apt-get update && apt-get install tilix -y
 RUN apt-get purge xscreensaver -y
 RUN apt-get update && apt-get install xfce4-whiskermenu-plugin mugshot -y
+RUN apt-get update && apt-get install meld -y
 
 RUN curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && \
   chmod +x /usr/local/bin/docker-compose && \
