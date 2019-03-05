@@ -19,6 +19,12 @@ usage() {
     restart)
 			echo "${PROGRAM_NAME} restart"
 			;;
+    profile)
+			echo "${PROGRAM_NAME} profile [OPTIONS]"
+      ;;
+    shell)
+			echo "${PROGRAM_NAME} shell [OPTIONS]"
+      ;;
 		help|*)
 		  echo "${PROGRAM_NAME} [COMMAND]"
 			echo "  start          Start Eclipse"
@@ -77,6 +83,41 @@ start() {
   done
 }
 
+profile() {
+  if ! started ; then
+    echo "Starting Eclipse"
+    (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
+    hold
+    echo "Eclipse Started"
+  else
+    echo "Eclipse Already Started"
+  fi
+
+  # Open Profiler
+  local tryCount=0
+  local tryLimit=5
+  until [ $tryCount -ge $tryLimit ]
+  do
+      ssh -X -oStrictHostKeyChecking=no developer@eclipse profile && break
+      tryCount=$[tryCountn+1]
+      sleep 1
+  done
+}
+
+shell() {
+  if ! started ; then
+    echo "Starting Eclipse"
+    (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) up -d --build > /dev/null 2>&1)
+    hold
+    echo "Eclipse Started"
+  else
+    echo "Eclipse Already Started"
+  fi
+
+  # Open Shell
+  (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) exec eclipse bash)
+}
+
 stop() {
   echo "Stopping Eclipse"
   (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) down > /dev/null 2>&1)
@@ -96,6 +137,8 @@ case $COMMAND in
 	start)	    start $@ ;;
   stop)       stop $@  ;;
   restart)    restart $@ ;;
+  profile)    profile $@ ;;
+  shell)      shell $@ ;;
   status)     status $@ ;;
 	*)          usage $COMMAND ;;
 esac

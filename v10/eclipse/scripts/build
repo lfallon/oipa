@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# Permissions
+chown -R $USER_NAME:$USER_NAME ${HOME}/.eclipse
+chown -R $USER_NAME:$USER_NAME ${ECLIPSE_WORKSPACE}
+chown -R $USER_NAME:$USER_NAME ${HOME}/git
+chown -R $USER_NAME:$USER_NAME ${HOME}/.m2
+chown -R $USER_NAME:$USER_NAME ${HOME}/scratch
+
 # Run
 su - $USER_NAME -c "mkdir -p ${HOME}/scratch/extensions"
 su - $USER_NAME -c "cd ${DEBUGGER_SOURCE} && mvn clean install"

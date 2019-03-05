@@ -58,11 +58,11 @@ configure() {
      server $user
      client $user
    fi
-   chown -R $user /home/$user/scratch
-   chown -R $user /home/$user/scratch/*
-   chown -R $user /home/$user/src
-   chown -R $user /home/$user/.ssh
-   chown -R $user /home/$user/git
+   chown -R $user:$user /home/$user/scratch
+   chown -R $user:$user /home/$user/scratch/*
+   chown -R $user:$user /home/$user/src
+   chown -R $user:$user /home/$user/.ssh
+   chown -R $user:$user /home/$user/git
 
    touch /home/$user/src/v10/.gitconfig
    if [ -f /home/$user/.gitconfig ] ; then

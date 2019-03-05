@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=VisualVM
+Comment=Java VisualVM Profiler
+Exec=eclipse profile
+Icon=/usr/share/icons/hicolor/scalable/apps/visualvm.svg
+Categories=Programming;Development;Java
