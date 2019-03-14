@@ -51,25 +51,37 @@ restart() {
   start;
 }
 
+restore() {
+  if ! started ; then start; fi;
+  (cd $DIR && docker-compose -p $(basename $(cd .. && pwd)) exec db restore $@)
+}
+
 usage() {
   key="$1"
-  echo "Usage:"
 	case $key in
 		start)
+      echo "Usage:"
 			echo "${PROGRAM_NAME} start [OPTIONS]"
 			;;
 		stop)
-			echo "${PROGRAM_NAME} stop [OPTIONS]"
+      echo "Usage:"
+      echo "${PROGRAM_NAME} stop [OPTIONS]"
 			;;
     restart)
+      echo "Usage:"
 			echo "${PROGRAM_NAME} restart"
 			;;
+    restore)
+      restore help
+      ;;
 		help|*)
+      echo "Usage:"
 		  echo "${PROGRAM_NAME} [COMMAND]"
 			echo "  start          Start MS SQL Server"
 			echo "  stop           Stop running MS SQL Server"
       echo "  restart        Restart running MS SQL Server"
       echo "  status         Status of MS SQL Server"
+      echo "  restore        Restore backup to database"
 			;;
 	esac
 }
@@ -83,6 +95,7 @@ case $COMMAND in
   stop)       stop $@  ;;
   restart)    restart $@ ;;
   status)     status $@ ;;
+  restore)    restore $@ ;;
 	*)          usage $COMMAND ;;
 esac
 
