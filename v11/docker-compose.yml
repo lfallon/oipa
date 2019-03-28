@@ -1,0 +1,128 @@
+version: "3"
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db.mssql
+    volumes:
+      - db-data:/var/opt/mssql
+      - ./env/restore:/restore
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+
+  oipa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - OIPA_VERSION=${OIPA_VERSION}
+        - PALETTE_VERSION=${PALETTE_VERSION}
+        - DEBUGGER_VERSION=${DEBUGGER_VERSION}
+    links:
+      - db
+    volumes:
+      - ./env/logs:/logs
+      - ./env/oipa:/overrides
+    ports:
+      - 9080:9080
+      - 9443:9443
+      - 7777:7777
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - IVS=${IVS}
+      - IVS_DB_NAME=${IVS_DB_NAME}
+
+  palette:
+    build:
+      context: .
+      dockerfile: Dockerfile.palette
+    entrypoint: /bin/bash
+    tty: true
+    links:
+      - db
+      - oipa
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    devices:
+      - "/dev/snd"
+    ports:
+      - 1044:1044
+    environment:
+      - DISPLAY=unix$DISPLAY
+      - PALETTE_URL=http://oipa:9080/PaletteConfig
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - IVS=${IVS}
+      - IVS_DB_NAME=${IVS_DB_NAME}
+
+  query:
+    build:
+      context: .
+      dockerfile: Dockerfile.query
+    entrypoint: /bin/bash
+    tty: true
+    links:
+      - db
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./env/scratch:/scratch
+    devices:
+      - "/dev/snd"
+    environment:
+      - DISPLAY=unix$DISPLAY
+
+  eclipse:
+    build:
+      context: .
+      dockerfile: Dockerfile.eclipse
+    entrypoint: /bin/bash
+    tty: true
+    links:
+      - db
+      - oipa
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./env/eclipse/workspace:/home/developer/eclipse-workspace
+      - ./env/eclipse/prefs:/home/developer/.eclipse
+      - ./env/eclipse/m2:/home/developer/.m2
+      - ./env/eclipse/git:/home/developer/git
+      - ./env/eclipse/.gitconfig:/home/developer/.gitconfig
+      - ./env/scratch:/home/developer/scratch
+    devices:
+      - "/dev/snd"
+    environment:
+      - DISPLAY=unix$DISPLAY
+
+  jd:
+    build:
+      context: .
+      dockerfile: Dockerfile.jd
+    entrypoint: /bin/bash
+    tty: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./env/scratch:/scratch
+    devices:
+      - "/dev/snd"
+    environment:
+      - DISPLAY=unix$DISPLAY
+
+  files:
+    build:
+      context: .
+      dockerfile: Dockerfile.files
+    volumes:
+      - ./env/eclipse/git:/srv/git
+      - ./env/scratch:/srv/scratch
+    ports:
+      - 9081:80
+
+volumes:
+  db-data:

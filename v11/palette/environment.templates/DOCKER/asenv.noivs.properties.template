@@ -1,0 +1,34 @@
+# NO IVS
+#Sun May 06 23:59:09 UTC 2018
+palette.user.name=\!?R3+8\\a.{J
+resource.password=${PROP_RESOURCE_PASSWORD}
+external.jar.file=/opt/jboss/AppData/Roaming/Oracle/asgraphicruleside//PaletteEnvironments/RulesIDE/configuration/ExternalJars/sqljdbc4.jar
+jdbc.user=${PROP_JDBC_USER}
+resource.jdbc.url=${PROP_JDBC_URL}
+ivs.release_management=off
+jdbc.password=20eAqcV5O71LrjUQ7hHSkw\=\=
+#jdbc.password=${PROP_JDBC_PASSWORD}
+debugWebserviceUsername=LTJ49
+jdbc.url=${PROP_JDBC_URL}
+jdbc.actual_driver_class=com.microsoft.sqlserver.jdbc.SQLServerDriver
+ivs.release_management.entry_env=false
+jdbc.dbdatabase=${PROP_JDBC_DB}
+jdbc.driver_class=com.adminserver.palette.pas.helper.dao.JDBCDelegateDriver
+resource.jdbc.password=20eAqcV5O71LrjUQ7hHSkw\=\=
+#resource.jdbc.password=${PROP_JDBC_PASSWORD}
+jdbc.port=1433
+PasConfigCacheClear=off
+resource.user=${PROP_RESOURCE_USER}
+jdbc.database=SQLServer
+jdbc.host=${PROP_JDBC_HOST}
+environmentType=Development
+propertiesWebservice_url=${PROP_PALETTE_URL}/ConfigureService?wsdl
+resource.jdbc.driver_class=com.adminserver.palette.pas.helper.dao.JDBCDelegateDriver
+resource.jdbc.user=${PROP_JDBC_USER}
+jdbc.database_type=SQLServer
+NBU=No
+EncryptionIterationCount=1000
+UseProducts=true
+EncryptionType=01
+resource.jdbc.database=SQLServer
+debugWebservicePassword=10010382879117RUvi0ZlOZFXZW39JhjShijTU/JLfvEQOySFuYWeRl1iYqU17K69vSfuL4/acHs+jLuwXCP07HfMnvD7w2DS1fg\=\=

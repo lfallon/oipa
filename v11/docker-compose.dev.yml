@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  oipa:
+    volumes:
+      - ./env/extensions:/extensions
+  eclipse:
+    volumes:
+      - ./env/extensions:/home/developer/extensions

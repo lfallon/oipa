@@ -1,0 +1,9 @@
+Package: oipa-bootstrap-cli
+Version: [[version]]
+Section: misc
+Priority: optional
+Architecture: all
+Depends: 
+Maintainer: Jerome Bridge <jeromebridge@pennassurancesoftware.com>
+Description: OIPA Bootstrap Command Line Interface
+Distribution: development

@@ -1,0 +1,25 @@
+<configuration>
+
+    <appender name="CLI_LOG" class="ch.qos.logback.core.FileAppender">
+        <file>${LOGS_HOME}/lifeops-cli.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="DEBUG_LOG" class="ch.qos.logback.core.FileAppender">
+        <file>${LOGS_HOME}/lifeops-cli-debug.log</file>
+        <encoder>
+            <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="CLI_LOG" />
+        <appender-ref ref="DEBUG_LOG" />
+    </root>
+
+</configuration>

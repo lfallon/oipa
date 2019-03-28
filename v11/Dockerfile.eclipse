@@ -1,0 +1,48 @@
+FROM openkbs/eclipse-oxygen-docker
+
+USER root
+
+RUN apt-get update && apt-get install lib32ncurses5 lib32z1 -y
+
+# Scripts
+RUN mkdir -p /scripts
+WORKDIR /scripts
+
+# Run Script
+COPY eclipse/run.sh .
+RUN chmod 755 run.sh
+
+# Build Script
+COPY eclipse/build.sh .
+RUN chmod 755 build.sh
+
+# Profile Script
+COPY eclipse/profile.sh .
+RUN chmod 755 profile.sh
+
+# Volumes
+RUN mkdir -p ${HOME}/.m2
+RUN mkdir -p ${HOME}/git
+RUN mkdir -p ${HOME}/extensions
+RUN mkdir -p ${HOME}/scratch
+# RUN touch ${HOME}/.gitconfig
+VOLUME ${HOME}/.m2
+VOLUME ${HOME}/git
+VOLUME ${HOME}/extensions
+VOLUME ${HOME}/scratch
+VOLUME ${HOME}/.gitconfig
+
+# Environment Variables
+ENV OIPA_TOOLS_SOURCE=${HOME}/git/oipa-tools
+ENV DEBUGGER_SOURCE=${OIPA_TOOLS_SOURCE}/debugger-v10
+
+USER $USER_NAME
+
+CMD ["/scripts/run.sh"]
+
+
+# docker build -t local/eclipse -f Dockerfile.eclipse .
+# docker run -it --rm -v $(pwd)/env/eclipse/workspace:/home/developer/eclipse-workspace -v $(pwd)/env/eclipse/prefs:/home/developer/.eclipse -v $(pwd)/env/eclipse/m2:/home/developer/.m2 -v $(pwd)/env/eclipse/git:/home/developer/git -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name eclipse local/eclipse
+
+
+# mkdir -p /tmp/ws && chmod 777 /tmp/ws && mkdir -p /tmp/.eclipse && chmod 777 /tmp/.eclipse && docker run -it --rm -v /tmp/ws:/home/developer/eclipse-workspace -v /tmp/.eclipse:/home/developer/.eclipse -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY --device /dev/snd --name eclipse openkbs/eclipse-oxygen-docker

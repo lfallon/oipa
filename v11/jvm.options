@@ -1,0 +1,12 @@
+
+-Dcom.ibm.websphere.webservices.DisableIBMJAXWSEngine=true
+-Dcom.ibm.websphere.jaxrs.server.DisableIBMJAXRSEngine=true
+
+-Dcom.ibm.websphere.webservices.UseWSFEP61ScanPolicy=true
+
+-Dcom.ibm.websphere.persistence.ApplicationsExcludedFromJpaProcessing=*
+
+-Djavax.xml.soap.MessageFactory=com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl
+-Djavax.xml.soap.SOAPFactory=com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPFactory1_1Impl
+-Djavax.xml.soap.SOAPConnectionFactory=com.sun.xml.internal.messaging.saaj.client.p2p.HttpSOAPConnectionFactory
+-Djavax.xml.soap.MetaFactory=com.sun.xml.internal.messaging.saaj.soap.SAAJMetaFactoryImpl

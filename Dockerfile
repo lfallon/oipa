@@ -39,6 +39,8 @@ RUN apt-get update && apt-get install -y curl
 COPY server.xml /config/
 RUN installUtility install --acceptLicense defaultServer
 
+
+
 # Logs
 RUN mkdir -p /logs
 VOLUME /logs

@@ -1,0 +1,14 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:trgt="http://ConfigureService">
+	<soapenv:Header>
+		<wsse:Security soapenv:actor="http://schemas.xmlsoap.org/soap/actor/next"
+			soapenv:mustUnderstand="0" xmlns:wsse="http://schemas.xmlsoap.org/ws/2002/04/secext">
+			<wsse:UsernameToken>
+				<wsse:Username xsi:type="xsd:string">install</wsse:Username>
+				<wsse:Password Type="PasswordText" type="xsd:string">F*?c)1R</wsse:Password>
+			</wsse:UsernameToken>
+		</wsse:Security>
+	</soapenv:Header>
+	<soapenv:Body />
+</soapenv:Envelope>
